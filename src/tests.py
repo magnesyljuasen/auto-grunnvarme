@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from scripts import Building, EnergyDemand, GeoEnergy, SolarPanels, HeatPump, DistrictHeating
+from scripts import Building, EnergyDemand, GeoEnergy, SolarPanels, HeatPump, DistrictHeating, Costs
 
 def energy_demand_tests():
     # instansiering av klassene
@@ -85,8 +85,65 @@ def geoenergy_tests():
     print(np.sum(building_instance.geoenergy_consumption_array))
     print(building_instance.find_energy_arrays())
 
-    
+    # energibehov fra fil -> grunnvarme dekker kun romoppvarming
+    print("---")
+    df = pd.read_csv('src/testdata/energy_demand_dummy.csv', sep=',', index_col=0)
+    spaceheating_array = df['SpaceHeating'].to_list()
+    dhw_array = df['DHW'].to_list()
+    building_instance = Building()
+    energydemand_instance = EnergyDemand(building_instance)
+    energydemand_instance.set_spaceheating_array(array = spaceheating_array)
+    energydemand_instance.set_dhw_array(array = dhw_array)
+    geoenergy_instance = GeoEnergy(building_instance)
+    geoenergy_instance.set_base_parameters(spaceheating_cop=3.5, spaceheating_coverage=90, dhw_cop=2, dhw_coverage=0)
+    geoenergy_instance.set_demand(spaceheating_demand=building_instance.spaceheating_array, dhw_demand=building_instance.dhw_array)
+    geoenergy_instance.simple_coverage_cop_calculation()
+    print(np.sum(building_instance.spaceheating_array + building_instance.dhw_array))
+    print(np.sum(building_instance.geoenergy_production_array))
+    print(np.sum(building_instance.geoenergy_consumption_array))
+    print(building_instance.find_energy_arrays())
+
+    # energibehov fra fil + solceller -> grunnvarme dekker romoppvarming + tappevann og solcelleproduksjon
+    print("---")
+    df = pd.read_csv('src/testdata/solar_dummy.csv', sep=';')
+    solar_array = df['Småhus'] * 100
+    df = pd.read_csv('src/testdata/energy_demand_dummy.csv', sep=',', index_col=0)
+    spaceheating_array = df['SpaceHeating'].to_list()
+    dhw_array = df['DHW'].to_list()
+    building_instance = Building()
+    energydemand_instance = EnergyDemand(building_instance)
+    energydemand_instance.set_spaceheating_array(array = spaceheating_array)
+    energydemand_instance.set_dhw_array(array = dhw_array)
+    geoenergy_instance = GeoEnergy(building_instance)
+    geoenergy_instance.set_base_parameters(spaceheating_cop=3.5, spaceheating_coverage=90, dhw_cop=2.5, dhw_coverage=70)
+    geoenergy_instance.set_demand(spaceheating_demand=building_instance.spaceheating_array, dhw_demand=building_instance.dhw_array)
+    geoenergy_instance.simple_coverage_cop_calculation()
+    solar_instance = SolarPanels(building_instance)
+    solar_instance.set_solar_array(array = solar_array)
+    print(building_instance.find_energy_arrays())
+
+def costs_tests():
+    # energibehov fra fil + solceller + grunnvarmeberegning -> kostnader
+    print("---")
+    df = pd.read_csv('src/testdata/solar_dummy.csv', sep=';')
+    solar_array = df['Småhus'] * 100
+    df = pd.read_csv('src/testdata/energy_demand_dummy.csv', sep=',', index_col=0)
+    spaceheating_array = df['SpaceHeating'].to_list()
+    dhw_array = df['DHW'].to_list()
+    building_instance = Building()
+    energydemand_instance = EnergyDemand(building_instance)
+    energydemand_instance.set_spaceheating_array(array = spaceheating_array)
+    energydemand_instance.set_dhw_array(array = dhw_array)
+    geoenergy_instance = GeoEnergy(building_instance)
+    geoenergy_instance.set_base_parameters(spaceheating_cop=3.5, spaceheating_coverage=90, dhw_cop=2.5, dhw_coverage=70)
+    geoenergy_instance.set_demand(spaceheating_demand=building_instance.spaceheating_array, dhw_demand=building_instance.dhw_array)
+    geoenergy_instance.simple_coverage_cop_calculation()
+    solar_instance = SolarPanels(building_instance)
+    solar_instance.set_solar_array(array = solar_array)
+    costs_instance = Costs(building_instance)
+
 
 if __name__ == "__main__":
     #energy_demand_tests()
-    geoenergy_tests()
+    #geoenergy_tests()
+    costs_tests()

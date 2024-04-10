@@ -8,6 +8,8 @@ from oauthlib.oauth2 import BackendApplicationClient
 def coverage_calculation(coverage_percentage, array):
     if coverage_percentage == 100:
         return array, np.zeros(8760)
+    elif coverage_percentage == 0:
+        return np.zeros(8760), array
     array_sorted = np.sort(array)
     timeserie_sum = np.sum(array)
     timeserie_N = len(array)
@@ -191,15 +193,18 @@ class GeoEnergy:
 
         
 
-        
-
-
-
 ################
         
 class SolarPanels:
     def __init__(self, building_instance):
         self.building_instance = building_instance
+
+    def set_solar_array(self, array):
+        self.solar_array = np.array(array)
+        self.building_instance.solar_production_array = -self.solar_array
+
+    def solar_calculation(self):
+        pass 
 
 ################
 
@@ -213,6 +218,15 @@ class HeatPump:
     def __init__(self, building_instance):
         self.building_instance = building_instance
 
+################
+        
+class Costs:
+    def __init__(self, building_instance):
+        self.building_instance = building_instance
+        self.energy_dict = self.building_instance.find_energy_arrays()
+
+    def set_base_parameters(self):
+        pass 
 
     
 
