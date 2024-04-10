@@ -77,13 +77,15 @@ def geoenergy_tests():
     energydemand_instance.set_spaceheating_array(array = spaceheating_array)
     energydemand_instance.set_dhw_array(array = dhw_array)
     geoenergy_instance = GeoEnergy(building_instance)
-    geoenergy_instance.set_base_parameters(spaceheating_cop=3, spaceheating_coverage=90, dhw_cop=2, dhw_coverage=80)
+    geoenergy_instance.set_base_parameters(spaceheating_cop=3.5, spaceheating_coverage=90, dhw_cop=2, dhw_coverage=80)
     geoenergy_instance.set_demand(spaceheating_demand=building_instance.spaceheating_array, dhw_demand=building_instance.dhw_array)
     geoenergy_instance.simple_coverage_cop_calculation()
-    print(np.sum(geoenergy_instance.heatpump_array))
-    print(np.sum(geoenergy_instance.peak_array))
-    print(np.sum(geoenergy_instance.compressor_array))
-    print(np.sum(geoenergy_instance.from_wells_array))
+    print(np.sum(building_instance.spaceheating_array + building_instance.dhw_array))
+    print(np.sum(building_instance.geoenergy_production_array))
+    print(np.sum(building_instance.geoenergy_consumption_array))
+    print(building_instance.find_energy_arrays())
+
+    
 
 if __name__ == "__main__":
     #energy_demand_tests()

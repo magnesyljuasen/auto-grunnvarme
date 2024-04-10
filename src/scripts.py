@@ -50,6 +50,13 @@ class Building:
         self.profet_building_type = [] # list of strings, , for combination-buildings
         self.temperature_array = []
 
+    def find_energy_arrays(self):
+        numpy_arrays = {}
+        for attr_name, value in self.__dict__.items():
+            if isinstance(value, np.ndarray) and len(value) == 8760:
+                numpy_arrays[attr_name] = value
+        return numpy_arrays
+
 ################
 
 class EnergyDemand:
@@ -178,6 +185,11 @@ class GeoEnergy:
         self.from_wells_array = spaceheating_from_wells + dhw_from_wells
         self.compressor_array = spaceheating_compressor + dhw_compressor
         self.peak_array = spaceheating_peak + dhw_peak
+
+        self.building_instance.geoenergy_production_array = -self.heatpump_array
+        self.building_instance.geoenergy_consumption_array = self.compressor_array + self.peak_array
+
+        
 
         
 
