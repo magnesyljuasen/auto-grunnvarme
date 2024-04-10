@@ -4,6 +4,34 @@ import numpy as np
 import pandas as pd
 from requests_oauthlib import OAuth2Session
 from oauthlib.oauth2 import BackendApplicationClient
+
+def coverage_calculation(coverage_percentage, array):
+    if coverage_percentage == 100:
+        return array, np.zeros(8760)
+    array_sorted = np.sort(array)
+    timeserie_sum = np.sum(array)
+    timeserie_N = len(array)
+    startpunkt = timeserie_N // 2
+    i = 0
+    avvik = 0.0001
+    pm = 2 + avvik
+    while abs(pm - 1) > avvik:
+        cutoff = array_sorted[startpunkt]
+        array_tmp = np.where(array > cutoff, cutoff, array)
+        beregnet_dekningsgrad = (np.sum(array_tmp) / timeserie_sum) * 100
+        pm = beregnet_dekningsgrad / coverage_percentage
+        gammelt_startpunkt = startpunkt
+        if pm < 1:
+            startpunkt = startpunkt + timeserie_N // 2 ** (i + 2) - 1
+        else:
+            startpunkt = startpunkt - timeserie_N // 2 ** (i + 2) - 1
+        if startpunkt == gammelt_startpunkt:
+            break
+        i += 1
+        if i > 13:
+            break
+    return array_tmp, array - array_tmp
+
 ################
 
 class Building:
@@ -48,19 +76,22 @@ class EnergyDemand:
         self.building_instance = building_instance
 
     def set_dhw_array(self, array):
-        self.building_instance.dhw_array = array
+        self.building_instance.dhw_array = np.array(array)
 
     def set_spaceheating_array(self, array):
-        self.building_instance.spaceheating_array = array
+        self.building_instance.spaceheating_array = np.array(array)
 
     def set_electric_array(self, array):
-        self.building_instance.electric_array = array
+        self.building_instance.electric_array = np.array(array)
 
     def profet_calculation(self):
         def get_secret(filename):
             with open(filename) as file:
                 secret = file.readline()
             return secret
+        dhw_array = np.zeros(8760)
+        spaceheating_array = np.zeros(8760)
+        electric_array = np.zeros(8760)
         for i in range(0, len(self.building_instance.profet_building_standard)):
             building_standard = self.building_instance.profet_building_standard[i]
             building_type = self.building_instance.profet_building_type[i]
@@ -102,9 +133,9 @@ class EnergyDemand:
             )
             if r.status_code == 200:
                 df = pd.DataFrame.from_dict(r.json())
-                dhw_array = df['DHW'].to_numpy()
-                spaceheating_array = df['SpaceHeating'].to_numpy()
-                electric_array = df['Electric'].to_numpy()
+                dhw_array = dhw_array + df['DHW'].to_numpy()
+                spaceheating_array = spaceheating_array + df['SpaceHeating'].to_numpy()
+                electric_array = electric_array + df['Electric'].to_numpy()
             else:
                 raise TypeError("PROFet virker ikke")
         
@@ -118,6 +149,39 @@ class EnergyDemand:
 class GeoEnergy:
     def __init__(self, building_instance):
         self.building_instance = building_instance
+        self.spaceheating_cop = float
+        self.spaceheating_coverage = float
+        self.dhw_cop = float
+        self.dhw_coverage = float
+
+    def set_base_parameters(self, spaceheating_cop=3.5, spaceheating_coverage=95, dhw_cop=2.5, dhw_coverage=70):
+        self.spaceheating_cop = spaceheating_cop
+        self.spaceheating_coverage = spaceheating_coverage
+        self.dhw_cop = dhw_cop
+        self.dhw_coverage = dhw_coverage
+
+    def set_demand(self, spaceheating_demand, dhw_demand, cooling_demand=np.zeros(8760)):
+        self.spaceheating_demand = spaceheating_demand
+        self.dhw_demand = dhw_demand
+        self.cooling_demand = cooling_demand
+
+    def simple_coverage_cop_calculation(self):
+        spaceheating_heatpump, spaceheating_peak = coverage_calculation(coverage_percentage=self.spaceheating_coverage, array=self.spaceheating_demand)
+        spaceheating_from_wells = spaceheating_heatpump - spaceheating_heatpump / self.spaceheating_cop
+        spaceheating_compressor = spaceheating_heatpump - spaceheating_from_wells
+
+        dhw_heatpump, dhw_peak = coverage_calculation(coverage_percentage=self.dhw_coverage, array=self.dhw_demand)
+        dhw_from_wells = dhw_heatpump - dhw_heatpump / self.dhw_cop
+        dhw_compressor = dhw_heatpump - dhw_from_wells
+
+        self.heatpump_array = spaceheating_heatpump + dhw_heatpump
+        self.from_wells_array = spaceheating_from_wells + dhw_from_wells
+        self.compressor_array = spaceheating_compressor + dhw_compressor
+        self.peak_array = spaceheating_peak + dhw_peak
+
+        
+
+
 
 ################
         
