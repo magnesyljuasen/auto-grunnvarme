@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from scripts import Building, EnergyDemand, GeoEnergy, SolarPanels, HeatPump, DistrictHeating, Costs
-ghhghg
+
 def energy_demand_tests():
     # instansiering av klassene
     print("---")
