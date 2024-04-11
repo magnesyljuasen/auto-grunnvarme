@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from requests_oauthlib import OAuth2Session
 from oauthlib.oauth2 import BackendApplicationClient
+import numpy_financial as npf
 
 def coverage_calculation(coverage_percentage, array):
     if coverage_percentage == 100:
@@ -328,7 +329,7 @@ class GreenEnergyFund:
     def __init__(self, building_instance):
         self.building_instance = building_instance
 
-    def set_base_parameters(self, investering_borehole=0, investering_øvrig=9012000, inflation=2.00, renteswap=2.25, rentemarginal=1.50, belåning=30.00, ekonomisk_livslengd=15, management_fee_percentage=1.00, bolagsskatt=22.00, driftskostnad_per_år=50000):
+    def set_economic_parameters(self, investering_borehole=0, investering_øvrig=9012000, inflation=2.00, renteswap=2.25, rentemarginal=1.50, belåning=30.00, ekonomisk_livslengd=15, management_fee_percentage=1.00, bolagsskatt=22.00, driftskostnad_per_år=50000):
         self.INVESTERING_BOREHOLE = investering_borehole
         self.INVESTERING_ØVIRG = investering_øvrig
         self.INFLATION = inflation
@@ -342,44 +343,78 @@ class GreenEnergyFund:
 
         self.INVESTERING = self.INVESTERING_BOREHOLE + self.INVESTERING_ØVIRG
         self.RENTEKOSTNAD = self.RENTESWAP + self.RENTEMARGINAL
-        self.EGENKAPTIAL = self.INVESTERING * (1 - self.BELÅNING)
+        self.EGENKAPTIAL = self.INVESTERING * (1 - self.BELÅNING/100)
         self.LÅN = self.INVESTERING - self.EGENKAPTIAL
 
-    def kalkyl_15_år(self, leasingavgift_år_1, amortering_lån_år=15):
-        print("---")
+    def set_energy_parameters(self, produced_heat=900000, produced_heat_value=1173724, consumed_electricity_cost=254500):
+        self.produced_heat = produced_heat
+        self.produced_heat_value = produced_heat_value
+        self.consumed_electricity_cost = consumed_electricity_cost
+
+    def calculation_15_year(self, leasingavgift_år_1, amortering_lån_år=15):
         # konstanter
         MANAGEMENT_FEE = -self.INVESTERING * self.MANAGEMENT_FEE_PERCENTAGE/100
         AVSKRIVNING = -self.INVESTERING / self.EKONOMISK_LIVSLENGD
-
+        if amortering_lån_år > 0:
+            AMORTERING = -self.LÅN / amortering_lån_år
+        else:
+            AMORTERING = 0
         # iterasjon
         avgift_array = []
         driftskostnad_array = []
         EBIT_array = []
-        for year in range(0, amortering_lån_år):
+        rentekostnad_array = []
+        EBT_array = []
+        bolagsskatt_array = []
+        gevinst_etter_skatt_array = []
+        kassaflode_innan_driftskostnader_array = []
+        cash_flow_array = []
+        for year in range(0, 15):
             if year == 0:
                 avgift = leasingavgift_år_1
                 driftskostnad = self.DRIFTSKOSTNAD_PER_ÅR
+                rentekostnad = self.LÅN * self.RENTEKOSTNAD/100
             else:
                 avgift = (1 + self.INFLATION/100) * avgift
                 driftskostnad = (1 + self.INFLATION/100) * driftskostnad
+                rentekostnad = (self.LÅN + AMORTERING * year) * self.RENTEKOSTNAD/100
             EBIT = avgift - driftskostnad + MANAGEMENT_FEE + AVSKRIVNING
-            
+            EBT = EBIT - rentekostnad
+            bolagsskatt = EBT * self.BOLAGSSKATT/100
+            if bolagsskatt < 0:
+                bolagsskatt = 0
+            gevinst_etter_skatt = EBT - bolagsskatt
+            kassaflode_innan_driftskostnader = driftskostnad - AVSKRIVNING + gevinst_etter_skatt
+            kassaflode_sum = kassaflode_innan_driftskostnader + AMORTERING
+
             avgift_array.append(round(avgift))
             driftskostnad_array.append(round(-driftskostnad))
             EBIT_array.append(round(EBIT))
+            rentekostnad_array.append(round(-rentekostnad))
+            EBT_array.append(round(EBT))
+            bolagsskatt_array.append(round(-bolagsskatt))
+            gevinst_etter_skatt_array.append(round(gevinst_etter_skatt))
+            kassaflode_innan_driftskostnader_array.append(round(kassaflode_innan_driftskostnader))
+            cash_flow_array.append(round(kassaflode_sum))
 
-        print(avgift_array)
-        print(driftskostnad_array)
-        print(MANAGEMENT_FEE)
-        print(AVSKRIVNING)
-        print(EBIT_array)
-        
+        cash_flow_array.insert(0, -round(self.EGENKAPTIAL))
+        avgift_array.insert(0, 0)
+        driftskostnad_array.insert(0, 0)
+        EBIT_array.insert(0, 0)
+        rentekostnad_array.insert(0, 0)
+        EBT_array.insert(0, 0)
+        bolagsskatt_array.insert(0, 0)
+        gevinst_etter_skatt_array.insert(0, 0)
+        self.df_profit_and_loss_15 = pd.DataFrame({
+            'Avgift' : avgift_array,
+            'Management fee' : np.full(16, MANAGEMENT_FEE),
+            'Driftskostnader' : driftskostnad_array,
+            'Avskrivning' : np.full(16, AVSKRIVNING),
+            'EBIT' : EBIT_array,
+            'Rentekostnad' : rentekostnad_array,
+            'EBT' : EBT_array,
+            'Bolagsskatt' : bolagsskatt_array,
+            'Gevinst etter skatt' : gevinst_etter_skatt_array
+        }).transpose()
 
-    
-        
-        
-
-    
-
-
-
+        self.irr_value_15 = npf.irr(cash_flow_array)

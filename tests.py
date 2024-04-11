@@ -235,10 +235,13 @@ def green_energy_fund_tests():
     operation_costs_instance.set_network_energy_component()
     operation_costs_instance.get_operation_costs()
     green_energy_fund_instance = GreenEnergyFund(building_instance)
-    green_energy_fund_instance.set_base_parameters()
+    green_energy_fund_instance.set_economic_parameters()
+    green_energy_fund_instance.set_energy_parameters()
     #green_energy_fund_instance.set_base_parameters(driftskostnad_per_år=building_instance.dict_operation_costs['geoenergy_consumption_compressor_array'])
-    green_energy_fund_instance.kalkyl_15_år(leasingavgift_år_1=round(green_energy_fund_instance.INVESTERING*0.102), amortering_lån_år=15)
+    green_energy_fund_instance.calculation_15_year(leasingavgift_år_1=round(green_energy_fund_instance.INVESTERING*0.102), amortering_lån_år=15)
     st.write(vars(building_instance))
+    st.write(green_energy_fund_instance.df_profit_and_loss_15)
+    st.write(f"**{round(green_energy_fund_instance.irr_value_15*100, 3)} %**")
 
 
 if __name__ == "__main__":
