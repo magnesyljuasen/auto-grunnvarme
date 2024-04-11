@@ -381,8 +381,8 @@ class GreenEnergyFund:
             EBIT = avgift - driftskostnad + MANAGEMENT_FEE + AVSKRIVNING
             EBT = EBIT - rentekostnad
             bolagsskatt = EBT * self.BOLAGSSKATT/100
-            if bolagsskatt < 0:
-                bolagsskatt = 0
+#            if bolagsskatt < 0:
+#                bolagsskatt = 0
             gevinst_etter_skatt = EBT - bolagsskatt
             kassaflode_innan_driftskostnader = driftskostnad - AVSKRIVNING + gevinst_etter_skatt
             kassaflode_sum = kassaflode_innan_driftskostnader + AMORTERING
@@ -407,9 +407,9 @@ class GreenEnergyFund:
         gevinst_etter_skatt_array.insert(0, 0)
         self.df_profit_and_loss_15 = pd.DataFrame({
             'Avgift' : avgift_array,
-            'Management fee' : np.full(16, MANAGEMENT_FEE),
+            'Management fee' : np.full(16, round(MANAGEMENT_FEE)),
             'Driftskostnader' : driftskostnad_array,
-            'Avskrivning' : np.full(16, AVSKRIVNING),
+            'Avskrivning' : np.full(16, round(AVSKRIVNING)),
             'EBIT' : EBIT_array,
             'Rentekostnad' : rentekostnad_array,
             'EBT' : EBT_array,
