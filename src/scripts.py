@@ -359,6 +359,9 @@ class GreenEnergyFund:
             AMORTERING = -self.LÅN / amortering_lån_år
         else:
             AMORTERING = 0
+        MANAGEMENT_FEE_array = [round(MANAGEMENT_FEE)] * 15
+        AVSKRIVNING_ARRAY = [round(AVSKRIVNING)] * 15
+        AMORTERING_ARRAY = [round(AMORTERING)] * 15
         # iterasjon
         avgift_array = []
         driftskostnad_array = []
@@ -397,6 +400,7 @@ class GreenEnergyFund:
             kassaflode_innan_driftskostnader_array.append(round(kassaflode_innan_driftskostnader))
             cash_flow_array.append(round(kassaflode_sum))
 
+        
         cash_flow_array.insert(0, -round(self.EGENKAPTIAL))
         avgift_array.insert(0, 0)
         driftskostnad_array.insert(0, 0)
@@ -405,11 +409,14 @@ class GreenEnergyFund:
         EBT_array.insert(0, 0)
         bolagsskatt_array.insert(0, 0)
         gevinst_etter_skatt_array.insert(0, 0)
+        MANAGEMENT_FEE_array.insert(0, 0)
+        AVSKRIVNING_ARRAY.insert(0, 0)
+        AMORTERING_ARRAY.insert(0, 0)
         self.df_profit_and_loss_15 = pd.DataFrame({
             'Avgift' : avgift_array,
-            'Management fee' : np.full(16, round(MANAGEMENT_FEE)),
+            'Management fee' : MANAGEMENT_FEE_array,
             'Driftskostnader' : driftskostnad_array,
-            'Avskrivning' : np.full(16, round(AVSKRIVNING)),
+            'Avskrivning' : AVSKRIVNING_ARRAY,
             'EBIT' : EBIT_array,
             'Rentekostnad' : rentekostnad_array,
             'EBT' : EBT_array,
