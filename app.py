@@ -67,3 +67,6 @@ st.checkbox(""" Klassen Visualization()""", value = False)
 st.caption(""" Lage en klasse som brukes for visualisering. 
            Denne skal ta inn Building()) og ha funksjoner for ulike visninger. 
            Planen er å lage et sett med standard-plot.""")
+
+st.checkbox(""" Klassen OperationCO2()""", value = False)
+st.caption(""" Få inn CO2 utslipp på strøm for ulike regioner. Denne kan kjøres på samme måte som OperationCosts""")
