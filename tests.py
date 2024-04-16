@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-from src.scripts import Building, EnergyDemand, GeoEnergy, SolarPanels, HeatPump, DistrictHeating, OperationCosts, GreenEnergyFund
+from src.scripts import Building, EnergyDemand, GeoEnergy, SolarPanels, HeatPump, DistrictHeating, OperationCosts, GreenEnergyFund, Visualization
 
 def energy_demand_tests():
     # instansiering av klassene
@@ -243,9 +243,40 @@ def green_energy_fund_tests():
     st.write(green_energy_fund_instance.df_profit_and_loss_15)
     st.write(f"**{round(green_energy_fund_instance.irr_value_15*100, 3)} %**")
 
+def visualization_tests():
+    # test simple plot 
+    df = pd.read_csv('src/testdata/energy_demand_dummy.csv', sep=',', index_col=0)
+    spaceheating_array = df['SpaceHeating'].to_list()
+    dhw_array = df['DHW'].to_list()
+    electric_array = df['Electric'].to_list()
+    building_instance = Building()
+    energydemand_instance = EnergyDemand(building_instance)
+    energydemand_instance.set_spaceheating_array(array = spaceheating_array)
+    energydemand_instance.set_dhw_array(array = dhw_array)
+    energydemand_instance.set_electric_array(array = electric_array)
+    visualization_instance = Visualization()
+    figure_thermal = visualization_instance.plot_hourly_series(
+        building_instance.dict_energy['dhw_array'],
+        'Tappevannsbehov',
+        building_instance.dict_energy['spaceheating_array'],
+        'Oppvarmingsbehov',
+        height=250,
+    )
+    figure_electric = visualization_instance.plot_hourly_series(
+        np.sort(building_instance.dict_energy['electric_array'])[::-1],
+        'Elektrisk',
+        height=250,
+        xtick_datemode=False,
+        linemode=True
+    )
+    st.plotly_chart(figure_thermal, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
+    st.plotly_chart(figure_electric, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
+    
+
 
 if __name__ == "__main__":
     #energy_demand_tests()
     #geoenergy_tests()
     #operation_costs_tests()
-    green_energy_fund_tests()
+    #green_energy_fund_tests()
+    visualization_tests()
