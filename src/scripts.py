@@ -5,8 +5,32 @@ import pandas as pd
 from requests_oauthlib import OAuth2Session
 from oauthlib.oauth2 import BackendApplicationClient
 import numpy_financial as npf
+from sklearn.linear_model import LinearRegression
+from GHEtool import Borefield, GroundConstantTemperature, HourlyGeothermalLoad, HourlyGeothermalLoadMultiYear
+import pygfunction as gt
 import datetime
 import plotly.graph_objects as go
+##
+import streamlit as st
+##
+
+def linear_interpolation(x, x1, x2, y1, y2):
+    y = y1 + (x - x1) * (y2 - y1) / (x2 - x1)
+    return y
+
+def linear_regression(x, y):
+    x = x.reshape((-1, 1))
+    model = LinearRegression()
+    model.fit(x, y)
+    model = LinearRegression().fit(x, y)
+    r_sq = model.score(x, y)
+    y_pred = model.predict(x)
+    y_pred = model.intercept_ + np.sum(model.coef_ * x, axis=1)
+    linear_y = model.predict(x)
+    slope = (linear_y[-1]-linear_y[0])/(x[-1]-x[0])
+    intersect = linear_y[-1]-slope*x[-1]
+    return slope, intersect
+
 
 def coverage_calculation(coverage_percentage, array):
     if coverage_percentage == 100:
@@ -198,6 +222,122 @@ class GeoEnergy:
         borehole_meters = round(np.sum(self.from_wells_array)/80)
         self.borehole_meters = borehole_meters
         self.building_instance.geoenergy_borehole_meters = borehole_meters
+
+    def _calculate_flow_temperature(self, OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE = 15, OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = -15, FLOW_TEMPERATURE_MIN = 35, FLOW_TEMPERATURE_MAX = 45):
+        outdoor_temperature_array = self.building_instance.temperature_array
+        flow_temperature = np.zeros(8760)
+        for i in range(0, len(flow_temperature)):
+            if outdoor_temperature_array[i] < OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE:
+                flow_temperature[i] = FLOW_TEMPERATURE_MAX
+            elif outdoor_temperature_array[i] > OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE:
+                flow_temperature[i] = FLOW_TEMPERATURE_MIN
+            else:
+                flow_temperature[i] = linear_interpolation(outdoor_temperature_array[i], OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE, OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, FLOW_TEMPERATURE_MAX, FLOW_TEMPERATURE_MIN)
+        return flow_temperature
+    
+    def _calculate_cop(self, source_temperature, SLOPE_FLOW_TEMPERATURE_MIN, SLOPE_FLOW_TEMPERATURE_MAX, INTERSECT_FLOW_TEMPERATURE_MIN, INTERSECT_FLOW_TEMPERATURE_MAX, flow_temperature_array, FLOW_TEMPERATURE_MAX, FLOW_TEMPERATURE_MIN, COP_YEAR):
+        cop_array = np.zeros(8760)
+        for i in range(0, len(cop_array)):
+            if flow_temperature_array[i] == FLOW_TEMPERATURE_MAX:
+                cop_array[i] = SLOPE_FLOW_TEMPERATURE_MAX * source_temperature[i + (COP_YEAR-1)*8760] + INTERSECT_FLOW_TEMPERATURE_MAX
+            elif flow_temperature_array[i] == FLOW_TEMPERATURE_MIN:
+                cop_array[i] = SLOPE_FLOW_TEMPERATURE_MIN * source_temperature[i+ (COP_YEAR-1)*8760] + INTERSECT_FLOW_TEMPERATURE_MIN
+            else:
+                slope_interpolated = linear_interpolation(flow_temperature_array[i], FLOW_TEMPERATURE_MAX, FLOW_TEMPERATURE_MIN, SLOPE_FLOW_TEMPERATURE_MAX, SLOPE_FLOW_TEMPERATURE_MIN)
+                intercept_interpolated = linear_interpolation(flow_temperature_array[i], FLOW_TEMPERATURE_MAX, FLOW_TEMPERATURE_MIN, INTERSECT_FLOW_TEMPERATURE_MAX, INTERSECT_FLOW_TEMPERATURE_MIN)
+                cop_interpolated = slope_interpolated * source_temperature[i + (COP_YEAR-1)*8760] + intercept_interpolated
+                cop_array[i] = cop_interpolated
+        return cop_array
+    
+    def set_simulation_parameters(self):
+        self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MIN = np.array([-5, -2, 0, 2, 5, 10, 15])
+        self.TECHNICAL_SHEET_COP_MIN = np.array([3.68, 4.03, 4.23, 4.41, 4.56, 5.04, 5.42])
+        self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MAX = np.array([-2, 0, 2, 5, 10, 15])
+        self.TECHNICAL_SHEET_COP_MAX = np.array([3.3, 3.47, 3.61, 3.77, 4.11, 4.4])
+
+        self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = 15, -15
+        self.FLOW_TEMPERATURE_MIN, self.FLOW_TEMPERATURE_MAX = 35, 45
+
+        self.SIMULATION_PERIOD = 25
+        self.THERMAL_CONDUCTIVITY = 3.5
+        self.UNDISTRUBED_GROUND_TEMPERATURE = 8
+        self.BOREHOLE_EQUIVALENT_RESISTANCE = 0.12
+        self.MAX_ALLOWED_FLUID_TEMPERATURE = 16
+        self.MIN_ALLOWED_FLUID_TEMPERATURE = 0
+        self.DISTANCE_BETWEEN_WELLS = 15
+        self.TARGET_DEPTH = 300
+
+    def advanced_sizing_of_boreholes(self, variable_cop_sizing = True):
+        slope_flow_temperature_min, intersect_flow_temperature_min = linear_regression(self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MIN, self.TECHNICAL_SHEET_COP_MIN)
+        slope_flow_temperature_max, intersect_flow_temperature_max = linear_regression(self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MAX, self.TECHNICAL_SHEET_COP_MAX)
+
+        flow_temperature_array = self._calculate_flow_temperature(
+            OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE=self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE,
+            OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE=self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE,
+            FLOW_TEMPERATURE_MIN=self.FLOW_TEMPERATURE_MIN,
+            FLOW_TEMPERATURE_MAX=self.FLOW_TEMPERATURE_MAX)   
+             
+        borefield = Borefield()
+        ground_data = GroundConstantTemperature(k_s=self.THERMAL_CONDUCTIVITY, T_g=self.UNDISTRUBED_GROUND_TEMPERATURE, volumetric_heat_capacity=2.4*10**6)
+        borefield.set_ground_parameters(data = ground_data)
+        borefield.set_Rb(Rb = self.BOREHOLE_EQUIVALENT_RESISTANCE)
+        borefield.set_max_avg_fluid_temperature(self.MAX_ALLOWED_FLUID_TEMPERATURE)  # maximum temperature
+        borefield.set_min_avg_fluid_temperature(self.MIN_ALLOWED_FLUID_TEMPERATURE)  # minimum temperature
+
+        NUMBER_OF_ITERATIONS = 10
+        cop_array = np.full(8760, 3.5)
+        number_of_wells_x = 1
+        number_of_wells_y = 1
+        distance_between_wells_x = self.DISTANCE_BETWEEN_WELLS
+        distance_between_wells_y = self.DISTANCE_BETWEEN_WELLS
+        borehole_length = 250
+        depth = 250
+        for i in range(0, NUMBER_OF_ITERATIONS):
+            from_wells_array = self.heatpump_array - self.heatpump_array/cop_array
+            field = gt.boreholes.rectangle_field(
+                N_1=number_of_wells_x,
+                N_2=number_of_wells_y,
+                B_1=distance_between_wells_x,
+                B_2=distance_between_wells_y,
+                H=borehole_length,
+                D=10, # borehole buried depth
+                r_b=0.114, # borehole radius
+                tilt=0 # tilt
+                )
+            load = HourlyGeothermalLoad(heating_load=from_wells_array, simulation_period=self.SIMULATION_PERIOD)
+            borefield.set_load(load = load)
+            borefield.set_borefield(borefield = field)
+            borefield.calculation_setup(use_constant_Rb=True) # constant Rb*
+            previous_depth = depth
+            depth = round(borefield.size(L4_sizing=True))
+
+            if variable_cop_sizing == True:
+                source_temperature = borefield.results.peak_heating
+                cop_array = self._calculate_cop(
+                    source_temperature=source_temperature,
+                    SLOPE_FLOW_TEMPERATURE_MIN=slope_flow_temperature_min,
+                    SLOPE_FLOW_TEMPERATURE_MAX=slope_flow_temperature_max,
+                    INTERSECT_FLOW_TEMPERATURE_MIN=intersect_flow_temperature_min,
+                    INTERSECT_FLOW_TEMPERATURE_MAX=intersect_flow_temperature_max,
+                    flow_temperature_array=flow_temperature_array,
+                    FLOW_TEMPERATURE_MAX=self.FLOW_TEMPERATURE_MAX,
+                    FLOW_TEMPERATURE_MIN=self.FLOW_TEMPERATURE_MIN,
+                    COP_YEAR = round(self.SIMULATION_PERIOD / 2) # velger år for COP som år 25 / 2 = 12
+                    )
+            
+            if depth > self.TARGET_DEPTH:
+                number_of_wells_x = number_of_wells_x + 1 # øke med en brønn
+            
+            if depth == previous_depth:
+                break
+
+        self.fluid_temperature = borefield.results.peak_heating
+        self.cop_array = cop_array
+        self.from_wells_array = from_wells_array
+        self.flow_temperature_array = flow_temperature_array
+        self.compressor_array = self.heatpump_array - self.from_wells_array
+        self.number_of_boreholes = borefield.number_of_boreholes
+        self.depth_per_borehole = depth   
 
     def calculate_investment_costs(self):
         self.investment_cost_borehole = round(20000 + self.borehole_meters * 437.5) # brønn + graving
