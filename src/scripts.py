@@ -375,6 +375,7 @@ class HeatPump:
 
     def advanced_sizing_of_heat_pump(self):
         # bør turtemperatur regnes ut for seg i en egen klasse?
+        # husk forskjell i COP-data fra denne og grunnvarme
         
         # turtemperatur fra utetemperatur
         # regne ut COP ut ifra turtemperatur og kildetemperatur (utetemperatur)
