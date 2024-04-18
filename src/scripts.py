@@ -337,7 +337,9 @@ class GeoEnergy:
         self.flow_temperature_array = flow_temperature_array
         self.compressor_array = self.heatpump_array - self.from_wells_array
         self.number_of_boreholes = borefield.number_of_boreholes
-        self.depth_per_borehole = depth   
+        self.depth_per_borehole = depth
+        self.borehole_meters = self.number_of_boreholes * self.depth_per_borehole
+        self.building_instance.geoenergy_borehole_meters = self.borehole_meters  
 
     def calculate_investment_costs(self):
         self.investment_cost_borehole = round(20000 + self.borehole_meters * 437.5) # brønn + graving
@@ -370,6 +372,14 @@ class DistrictHeating:
 class HeatPump:
     def __init__(self, building_instance):
         self.building_instance = building_instance
+
+    def advanced_sizing_of_heat_pump(self):
+        # bør turtemperatur regnes ut for seg i en egen klasse?
+        
+        # turtemperatur fra utetemperatur
+        # regne ut COP ut ifra turtemperatur og kildetemperatur (utetemperatur)
+        # få ut serier
+        pass 
 
 ################
         
@@ -584,7 +594,14 @@ class Visualization:
         showlegend=True,
         linemode=False,
         xtick_datemode=True,
+        yticksuffix=' kW',
+        unit='kW'
     ):
+        if unit == 'kW':
+            unit_sum = 'kWh/år'
+        elif unit == 'kr':
+            unit_sum = 'kr/år'
+            
         num_series = len(args) // 2
         colors = colors[:num_series]  # Ensure colors match the number of series
         y_arrays = [arg for arg in args[::2]]
@@ -615,7 +632,7 @@ class Visualization:
                     stackgroup=stackgroup,
                     fill=fill,
                     line=dict(width=width, color=colors[i]),
-                    name=f"{args[i*2+1]}:<br>{int(round(np.sum(y_arrays[i]),-2)):,} kWh/år | {int(np.max(y_arrays[i])):,} kW".replace(",", " ").replace(".", ",")
+                    name=f"{args[i*2+1]}:<br>{round(np.sum(y_arrays[i])):,} {unit_sum} | {round(np.max(y_arrays[i])):,} {unit}".replace(",", " ").replace(".", ",")
                     )
                 )
         fig.update_layout(
@@ -638,7 +655,7 @@ class Visualization:
             gridcolor="lightgrey",
         )
         fig.update_yaxes(
-            ticksuffix=' kW',
+            ticksuffix=yticksuffix,
             range=[ymin, ymax],
             mirror=True,
             ticks="outside",
