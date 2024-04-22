@@ -173,6 +173,31 @@ class EnergyDemand:
         self.set_spaceheating_array(spaceheating_array)
         self.set_electric_array(electric_array)
 
+    def calcluate_flow_temperature(self):
+        self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = 15, -15
+        self.FLOW_TEMPERATURE_MIN, self.FLOW_TEMPERATURE_MAX = 35, 55
+
+        self.flow_temperature_array = self._calculate_flow_temperature(
+            OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE=self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE,
+            OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE=self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE,
+            FLOW_TEMPERATURE_MIN=self.FLOW_TEMPERATURE_MIN,
+            FLOW_TEMPERATURE_MAX=self.FLOW_TEMPERATURE_MAX)
+        
+        self.building_instance.flow_temperature_array = self.flow_temperature_array
+        self.building_instance.FLOW_TEMPERATURE_MIN, self.building_instance.FLOW_TEMPERATURE_MAX = self.FLOW_TEMPERATURE_MIN, self.FLOW_TEMPERATURE_MAX
+        self.building_instance.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, self.building_instance.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE
+        
+    def _calculate_flow_temperature(self, OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE = 15, OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = -15, FLOW_TEMPERATURE_MIN = 35, FLOW_TEMPERATURE_MAX = 45):
+        outdoor_temperature_array = self.building_instance.temperature_array
+        flow_temperature = np.zeros(8760)
+        for i in range(0, len(flow_temperature)):
+            if outdoor_temperature_array[i] < OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE:
+                flow_temperature[i] = FLOW_TEMPERATURE_MAX
+            elif outdoor_temperature_array[i] > OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE:
+                flow_temperature[i] = FLOW_TEMPERATURE_MIN
+            else:
+                flow_temperature[i] = linear_interpolation(outdoor_temperature_array[i], OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE, OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, FLOW_TEMPERATURE_MAX, FLOW_TEMPERATURE_MIN)
+        return flow_temperature
 
 ################
         
@@ -222,18 +247,6 @@ class GeoEnergy:
         borehole_meters = round(np.sum(self.from_wells_array)/80)
         self.borehole_meters = borehole_meters
         self.building_instance.geoenergy_borehole_meters = borehole_meters
-
-    def _calculate_flow_temperature(self, OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE = 15, OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = -15, FLOW_TEMPERATURE_MIN = 35, FLOW_TEMPERATURE_MAX = 45):
-        outdoor_temperature_array = self.building_instance.temperature_array
-        flow_temperature = np.zeros(8760)
-        for i in range(0, len(flow_temperature)):
-            if outdoor_temperature_array[i] < OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE:
-                flow_temperature[i] = FLOW_TEMPERATURE_MAX
-            elif outdoor_temperature_array[i] > OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE:
-                flow_temperature[i] = FLOW_TEMPERATURE_MIN
-            else:
-                flow_temperature[i] = linear_interpolation(outdoor_temperature_array[i], OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE, OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, FLOW_TEMPERATURE_MAX, FLOW_TEMPERATURE_MIN)
-        return flow_temperature
     
     def _calculate_cop(self, source_temperature, SLOPE_FLOW_TEMPERATURE_MIN, SLOPE_FLOW_TEMPERATURE_MAX, INTERSECT_FLOW_TEMPERATURE_MIN, INTERSECT_FLOW_TEMPERATURE_MAX, flow_temperature_array, FLOW_TEMPERATURE_MAX, FLOW_TEMPERATURE_MIN, COP_YEAR):
         cop_array = np.zeros(8760)
@@ -255,9 +268,6 @@ class GeoEnergy:
         self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MAX = np.array([-2, 0, 2, 5, 10, 15])
         self.TECHNICAL_SHEET_COP_MAX = np.array([3.3, 3.47, 3.61, 3.77, 4.11, 4.4])
 
-        self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = 15, -15
-        self.FLOW_TEMPERATURE_MIN, self.FLOW_TEMPERATURE_MAX = 35, 45
-
         self.SIMULATION_PERIOD = 25
         self.THERMAL_CONDUCTIVITY = 3.5
         self.UNDISTRUBED_GROUND_TEMPERATURE = 8
@@ -268,14 +278,8 @@ class GeoEnergy:
         self.TARGET_DEPTH = 300
 
     def advanced_sizing_of_boreholes(self, variable_cop_sizing = True):
-        slope_flow_temperature_min, intersect_flow_temperature_min = linear_regression(self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MIN, self.TECHNICAL_SHEET_COP_MIN)
-        slope_flow_temperature_max, intersect_flow_temperature_max = linear_regression(self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MAX, self.TECHNICAL_SHEET_COP_MAX)
-
-        flow_temperature_array = self._calculate_flow_temperature(
-            OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE=self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE,
-            OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE=self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE,
-            FLOW_TEMPERATURE_MIN=self.FLOW_TEMPERATURE_MIN,
-            FLOW_TEMPERATURE_MAX=self.FLOW_TEMPERATURE_MAX)   
+        self.slope_flow_temperature_min, self.intersect_flow_temperature_min = linear_regression(self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MIN, self.TECHNICAL_SHEET_COP_MIN)
+        self.slope_flow_temperature_max, self.intersect_flow_temperature_max = linear_regression(self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MAX, self.TECHNICAL_SHEET_COP_MAX)   
              
         borefield = Borefield()
         ground_data = GroundConstantTemperature(k_s=self.THERMAL_CONDUCTIVITY, T_g=self.UNDISTRUBED_GROUND_TEMPERATURE, volumetric_heat_capacity=2.4*10**6)
@@ -315,13 +319,13 @@ class GeoEnergy:
                 source_temperature = borefield.results.peak_heating
                 cop_array = self._calculate_cop(
                     source_temperature=source_temperature,
-                    SLOPE_FLOW_TEMPERATURE_MIN=slope_flow_temperature_min,
-                    SLOPE_FLOW_TEMPERATURE_MAX=slope_flow_temperature_max,
-                    INTERSECT_FLOW_TEMPERATURE_MIN=intersect_flow_temperature_min,
-                    INTERSECT_FLOW_TEMPERATURE_MAX=intersect_flow_temperature_max,
-                    flow_temperature_array=flow_temperature_array,
-                    FLOW_TEMPERATURE_MAX=self.FLOW_TEMPERATURE_MAX,
-                    FLOW_TEMPERATURE_MIN=self.FLOW_TEMPERATURE_MIN,
+                    SLOPE_FLOW_TEMPERATURE_MIN=self.slope_flow_temperature_min,
+                    SLOPE_FLOW_TEMPERATURE_MAX=self.slope_flow_temperature_max,
+                    INTERSECT_FLOW_TEMPERATURE_MIN=self.intersect_flow_temperature_min,
+                    INTERSECT_FLOW_TEMPERATURE_MAX=self.intersect_flow_temperature_max,
+                    flow_temperature_array=self.building_instance.flow_temperature_array,
+                    FLOW_TEMPERATURE_MAX=self.building_instance.FLOW_TEMPERATURE_MAX,
+                    FLOW_TEMPERATURE_MIN=self.building_instance.FLOW_TEMPERATURE_MIN,
                     COP_YEAR = round(self.SIMULATION_PERIOD / 2) # velger år for COP som år 25 / 2 = 12
                     )
             
@@ -330,11 +334,12 @@ class GeoEnergy:
             
             if depth == previous_depth:
                 break
-
+        
+        self.field = gt.boreholes.visualize_field(field)
         self.fluid_temperature = borefield.results.peak_heating
         self.cop_array = cop_array
         self.from_wells_array = from_wells_array
-        self.flow_temperature_array = flow_temperature_array
+        self.flow_temperature_array = self.building_instance.flow_temperature_array
         self.compressor_array = self.heatpump_array - self.from_wells_array
         self.number_of_boreholes = borefield.number_of_boreholes
         self.depth_per_borehole = depth
@@ -373,15 +378,70 @@ class HeatPump:
     def __init__(self, building_instance):
         self.building_instance = building_instance
 
+    def set_base_parameters(self, spaceheating_cop=3.5, spaceheating_coverage=95, dhw_cop=2.5, dhw_coverage=70):
+        self.spaceheating_cop = spaceheating_cop
+        self.spaceheating_coverage = spaceheating_coverage
+        self.dhw_cop = dhw_cop
+        self.dhw_coverage = dhw_coverage
+
+    def set_demand(self, spaceheating_demand, dhw_demand):
+        self.spaceheating_demand = spaceheating_demand
+        self.dhw_demand = dhw_demand
+        
+    def set_simulation_parameters(self):
+        self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MIN = np.array([-5, -2, 0, 2, 5, 10, 15])
+        self.TECHNICAL_SHEET_COP_MIN = np.array([3.68, 4.03, 4.23, 4.41, 4.56, 5.04, 5.42]) - 2
+        self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MAX = np.array([-2, 0, 2, 5, 10, 15])
+        self.TECHNICAL_SHEET_COP_MAX = np.array([3.3, 3.47, 3.61, 3.77, 4.11, 4.4]) - 2
+
+    def _calculate_cop(self, source_temperature, SLOPE_FLOW_TEMPERATURE_MIN, SLOPE_FLOW_TEMPERATURE_MAX, INTERSECT_FLOW_TEMPERATURE_MIN, INTERSECT_FLOW_TEMPERATURE_MAX, flow_temperature_array, FLOW_TEMPERATURE_MAX, FLOW_TEMPERATURE_MIN):
+        cop_array = np.zeros(8760)
+        for i in range(0, len(cop_array)):
+            if flow_temperature_array[i] == FLOW_TEMPERATURE_MAX:
+                cop_array[i] = SLOPE_FLOW_TEMPERATURE_MAX * source_temperature[i] + INTERSECT_FLOW_TEMPERATURE_MAX
+            elif flow_temperature_array[i] == FLOW_TEMPERATURE_MIN:
+                cop_array[i] = SLOPE_FLOW_TEMPERATURE_MIN * source_temperature[i] + INTERSECT_FLOW_TEMPERATURE_MIN
+            else:
+                slope_interpolated = linear_interpolation(flow_temperature_array[i], FLOW_TEMPERATURE_MAX, FLOW_TEMPERATURE_MIN, SLOPE_FLOW_TEMPERATURE_MAX, SLOPE_FLOW_TEMPERATURE_MIN)
+                intercept_interpolated = linear_interpolation(flow_temperature_array[i], FLOW_TEMPERATURE_MAX, FLOW_TEMPERATURE_MIN, INTERSECT_FLOW_TEMPERATURE_MAX, INTERSECT_FLOW_TEMPERATURE_MIN)
+                cop_interpolated = slope_interpolated * source_temperature[i] + intercept_interpolated
+                cop_array[i] = cop_interpolated
+        return cop_array
+    
     def advanced_sizing_of_heat_pump(self):
+        spaceheating_heatpump, spaceheating_peak = coverage_calculation(coverage_percentage=self.spaceheating_coverage, array=self.spaceheating_demand)
+        dhw_heatpump, dhw_peak = coverage_calculation(coverage_percentage=self.dhw_coverage, array=self.dhw_demand)
+        self.heatpump_array = spaceheating_heatpump + dhw_heatpump
+        self.peak_array = spaceheating_peak + dhw_peak
+
+        slope_flow_temperature_min, intersect_flow_temperature_min = linear_regression(self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MIN, self.TECHNICAL_SHEET_COP_MIN)
+        slope_flow_temperature_max, intersect_flow_temperature_max = linear_regression(self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MAX, self.TECHNICAL_SHEET_COP_MAX)
+
+        source_temperature = self.building_instance.temperature_array     
+        self.cop_array = self._calculate_cop(
+            source_temperature=source_temperature,
+            SLOPE_FLOW_TEMPERATURE_MIN=slope_flow_temperature_min,
+            SLOPE_FLOW_TEMPERATURE_MAX=slope_flow_temperature_max,
+            INTERSECT_FLOW_TEMPERATURE_MIN=intersect_flow_temperature_min,
+            INTERSECT_FLOW_TEMPERATURE_MAX=intersect_flow_temperature_max,
+            flow_temperature_array=self.building_instance.flow_temperature_array,
+            FLOW_TEMPERATURE_MAX=self.building_instance.FLOW_TEMPERATURE_MAX,
+            FLOW_TEMPERATURE_MIN=self.building_instance.FLOW_TEMPERATURE_MIN,
+            )
+        self.from_air_array = self.heatpump_array - self.heatpump_array/self.cop_array
+        self.compressor_array = self.heatpump_array - self.from_air_array
+
+        self.building_instance.dict_energy['heatpump_production_array'] = -self.heatpump_array
+        self.building_instance.dict_energy['heatpump_consumption_compressor_array'] = self.compressor_array
+        self.building_instance.dict_energy['heatpump_consumption_peak_array'] = self.peak_array  
+        
+        
         # bør turtemperatur regnes ut for seg i en egen klasse?
         # husk forskjell i COP-data fra denne og grunnvarme
         
         # turtemperatur fra utetemperatur
         # regne ut COP ut ifra turtemperatur og kildetemperatur (utetemperatur)
         # få ut serier
-        pass 
-
 ################
         
 class OperationCosts:

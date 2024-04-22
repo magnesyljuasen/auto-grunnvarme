@@ -18,6 +18,7 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
     building_instance.temperature_array = temperature_array
     energydemand_instance = EnergyDemand(building_instance)
     energydemand_instance.profet_calculation()
+    energydemand_instance.calcluate_flow_temperature()
     geoenergy_instance = GeoEnergy(building_instance)
     geoenergy_instance.set_base_parameters(spaceheating_cop=ROMOPPVARMING_COP, spaceheating_coverage=ROMOPPVARMING_DEKNINGSGRAD, dhw_cop=TAPPEVANN_COP, dhw_coverage=TAPPEVANN_DEKNINGSGRAD)
     geoenergy_instance.set_demand(spaceheating_demand=building_instance.dict_energy['spaceheating_array'], dhw_demand=building_instance.dict_energy['dhw_array'])
@@ -28,6 +29,9 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
     geoenergy_instance.calculate_investment_costs()
     #--
     heatpump_instance = HeatPump(building_instance)
+    heatpump_instance.set_base_parameters(spaceheating_cop=ROMOPPVARMING_COP, spaceheating_coverage=ROMOPPVARMING_DEKNINGSGRAD, dhw_cop=TAPPEVANN_COP, dhw_coverage=TAPPEVANN_DEKNINGSGRAD)
+    heatpump_instance.set_demand(spaceheating_demand=building_instance.dict_energy['spaceheating_array'], dhw_demand=building_instance.dict_energy['dhw_array'])
+    heatpump_instance.set_simulation_parameters()
     heatpump_instance.advanced_sizing_of_heat_pump()
     #--
     operation_costs_instance = OperationCosts(building_instance)
@@ -59,12 +63,22 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
         height=250,
         colors=("#367061", "#8ec9b9")
     )
-    figure_thermal = visualization_instance.plot_hourly_series(
+    figure_geoenergy = visualization_instance.plot_hourly_series(
         geoenergy_instance.compressor_array,
         'Strøm til varmepumpe',
         geoenergy_instance.from_wells_array,
         'Levert fra brønner',
         geoenergy_instance.peak_array,
+        'Spisslast',
+        height=250,
+        colors=("#1d3c34", "#48a23f", "#FFC358")
+    )
+    figure_heatpump = visualization_instance.plot_hourly_series(
+        heatpump_instance.compressor_array,
+        'Strøm til varmepumpe',
+        heatpump_instance.from_air_array,
+        'Levert fra luft',
+        heatpump_instance.peak_array,
         'Spisslast',
         height=250,
         colors=("#1d3c34", "#48a23f", "#FFC358")
@@ -86,6 +100,18 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
         building_instance.dict_operation_costs['geoenergy_consumption_compressor_array'],
         'Strøm til varmepumpe',
         building_instance.dict_operation_costs['geoenergy_consumption_peak_array'],
+        'Strøm til spisslast',
+        unit='kr',
+        yticksuffix=' kr',
+        ymin=0,
+        ymax=ymax_costs,
+        height=250,
+        colors=("#367061", "#8ec9b9")
+    )
+    figure_cost_heatpump = visualization_instance.plot_hourly_series(
+        building_instance.dict_operation_costs['heatpump_consumption_compressor_array'],
+        'Strøm til varmepumpe',
+        building_instance.dict_operation_costs['heatpump_consumption_peak_array'],
         'Strøm til spisslast',
         unit='kr',
         yticksuffix=' kr',
@@ -116,7 +142,7 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
     st.markdown('---')
     st.header('2) Bergvarme')
     st.subheader('Energiflyt')
-    st.plotly_chart(figure_thermal, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
+    st.plotly_chart(figure_geoenergy, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
     with st.expander("Detaljerte figurer", expanded=False):
         st.caption("Turtemperatur, varmesystem")
         st.line_chart(geoenergy_instance.flow_temperature_array, height=150)
@@ -124,8 +150,12 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
         st.line_chart(building_instance.temperature_array, height=150)
         st.caption("Brønntemperatur, år 12-13")
         st.line_chart(geoenergy_instance.fluid_temperature[8760*12:8760*13], height=150)
+        st.pyplot(geoenergy_instance.field, use_container_width=True)
+#        st.caption("Brønntemperatur")
+#        st.line_chart(geoenergy_instance.fluid_temperature, height=150)
         st.caption("COP")
         st.line_chart(geoenergy_instance.cop_array, height=150)
+        st.metric('Gjennomsnittlig COP', value = round(np.mean(geoenergy_instance.cop_array),1))
     st.subheader('Investering')
     c1, c2 = st.columns(2)
     with c1:
@@ -147,11 +177,34 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
         st.plotly_chart(figure_cost_direct_electric_heating, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
         geoenergy_operation_costs_per_year = round(np.sum(building_instance.dict_operation_costs['spaceheating_array'] + building_instance.dict_operation_costs['dhw_array']))
         st.metric(f'Driftskostnad for **direkte elektrisk oppvarming**', value = f'{geoenergy_operation_costs_per_year:,} kr/år'.replace(',', ' '))
-    st.subheader('Serviettkalkyle')
-    st.write(f"IRR: **{round(green_energy_fund_instance.irr_value_15*100, 3)} %**")
-    st.dataframe(data = green_energy_fund_instance.df_profit_and_loss_15, use_container_width=True)
+#    st.subheader('Serviettkalkyle')
+#    st.write(f"IRR: **{round(green_energy_fund_instance.irr_value_15*100, 3)} %**")
+#    st.dataframe(data = green_energy_fund_instance.df_profit_and_loss_15, use_container_width=True)
     st.markdown('---')
-    st.header('3) Væske-vann-varmepumpe')
+    st.header('3) Luft-vann-varmepumpe')
+    st.subheader('Energiflyt')
+    st.plotly_chart(figure_heatpump, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
+    with st.expander("Detaljerte figurer", expanded=False):
+        st.caption("COP")
+        st.line_chart(heatpump_instance.cop_array, height=150)
+        st.metric('Gjennomsnittlig COP', value = round(np.mean(heatpump_instance.cop_array),1))
+    st.subheader('Investering')
+    st.write('...')
+    st.subheader('Driftskostnader')
+    c1, c2 = st.columns(2)
+    with c1:
+        st.write('**Luft-vann-varmepumpe**')
+        st.plotly_chart(figure_cost_heatpump, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
+        geoenergy_operation_costs_per_year = round(np.sum(building_instance.dict_operation_costs['heatpump_consumption_compressor_array'] + building_instance.dict_operation_costs['heatpump_consumption_peak_array']))
+        st.metric(f'Driftskostnad for **luft-vann-varmepumpe**', value = f'{geoenergy_operation_costs_per_year:,} kr/år'.replace(',', ' '))
+    with c2:
+        st.write('**Elektrisk oppvarming**')
+        st.plotly_chart(figure_cost_direct_electric_heating, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
+        geoenergy_operation_costs_per_year = round(np.sum(building_instance.dict_operation_costs['spaceheating_array'] + building_instance.dict_operation_costs['dhw_array']))
+        st.metric(f'Driftskostnad for **direkte elektrisk oppvarming**', value = f'{geoenergy_operation_costs_per_year:,} kr/år'.replace(',', ' '))
+
+    st.write(vars(building_instance))
+
 
         
 selected_byggetrinn = st.radio('Velg byggetrinn', options=['Byggetrinn 2', 'Byggetrinn 1 + 2'])
@@ -164,9 +217,9 @@ ROMOPPVARMING_COP = 3.5
 ROMOPPVARMING_DEKNINGSGRAD = 95
 TAPPEVANN_COP = 3.5
 TAPPEVANN_DEKNINGSGRAD = 90
-BYGNINGSSTANDARD = st.selectbox('Bygningsstandard', options=['Veldig energieffektivt', 'Middels energieffektivt'])
+BYGNINGSSTANDARD = st.selectbox('Bygningsstandard', options=['Middels energieffektivt'])
 TEMPERATUR = st.selectbox('Temperaturår', options=['2022-2023', '2021-2022', '2020-2021', '2019-2020'])
-SPOT_YEAR = st.selectbox('Spotprisår', options=[2021, 2022, 2023])
+SPOT_YEAR = st.selectbox('Spotprisår', options=[2023, 2022, 2021])
 SPOT_REGION = 'NO3'
 SPOT_PAASLAG = 0
 
