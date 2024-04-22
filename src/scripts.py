@@ -175,7 +175,7 @@ class EnergyDemand:
 
     def calcluate_flow_temperature(self):
         self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = 15, -15
-        self.FLOW_TEMPERATURE_MIN, self.FLOW_TEMPERATURE_MAX = 35, 55
+        self.FLOW_TEMPERATURE_MIN, self.FLOW_TEMPERATURE_MAX = 35, 45
 
         self.flow_temperature_array = self._calculate_flow_temperature(
             OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE=self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE,
@@ -662,6 +662,10 @@ class Visualization:
             unit_sum = 'kWh/år'
         elif unit == 'kr':
             unit_sum = 'kr/år'
+        elif unit == '°C':
+            unit_sum = '°C'
+        elif unit == '-':
+            unit_sum = '-'
             
         num_series = len(args) // 2
         colors = colors[:num_series]  # Ensure colors match the number of series
@@ -697,23 +701,25 @@ class Visualization:
                     )
                 )
         fig.update_layout(
-            legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.01, bgcolor="rgba(0,0,0,0)"),
+            legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.01, bgcolor="rgba(0,0,0,0)", font=dict(size=16)),
             height=height,
             xaxis_title=xlabel, 
             yaxis_title=ylabel,
             barmode=barmode, 
-            margin=dict(l=0, r=0, t=0, b=0, pad=0),
-            showlegend=showlegend
+            margin=dict(l=20, r=20, t=20, b=20, pad=0),
+            showlegend=showlegend,
+            xaxis=dict(tickfont=dict(size=16), gridwidth=0.1),
+            yaxis=dict(tickfont=dict(size=16), gridwidth=0.1),
         )
         fig.update_xaxes(
             ticksuffix=ticksuffix,
-            tickformat="%d.%b",
+            tickformat="%d.%m",
             range=[start, end],
             mirror=True,
             ticks="outside",
             showline=True,
-            linecolor="black",
-            gridcolor="lightgrey",
+            #linecolor="black",
+            #gridcolor="lightgrey",
         )
         fig.update_yaxes(
             ticksuffix=yticksuffix,
@@ -721,7 +727,7 @@ class Visualization:
             mirror=True,
             ticks="outside",
             showline=True,
-            linecolor="black",
-            gridcolor="lightgrey",
+            #linecolor="black",
+            #gridcolor="lightgrey",
         )
         return fig

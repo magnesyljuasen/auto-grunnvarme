@@ -61,6 +61,8 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
 #        building_instance.dict_energy['electric_array'],
 #        'Elspesifkt behov',
         height=250,
+        ylabel='Effekt (kW)',
+        yticksuffix=None,
         colors=("#367061", "#8ec9b9")
     )
     figure_geoenergy = visualization_instance.plot_hourly_series(
@@ -70,6 +72,8 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
         'Levert fra brønner',
         geoenergy_instance.peak_array,
         'Spisslast',
+        ylabel='Effekt (kW)',
+        yticksuffix=None,
         height=250,
         colors=("#1d3c34", "#48a23f", "#FFC358")
     )
@@ -80,6 +84,8 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
         'Levert fra luft',
         heatpump_instance.peak_array,
         'Spisslast',
+        ylabel='Effekt (kW)',
+        yticksuffix=None,
         height=250,
         colors=("#1d3c34", "#48a23f", "#FFC358")
     )
@@ -90,7 +96,8 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
         building_instance.dict_operation_costs['spaceheating_array'],
         'Strøm til romoppvarming',
         unit='kr',
-        yticksuffix=' kr',
+        ylabel='Kostnad (kr)',
+        yticksuffix=None,
         ymin=0,
         ymax=ymax_costs,
         height=250,
@@ -102,7 +109,8 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
         building_instance.dict_operation_costs['geoenergy_consumption_peak_array'],
         'Strøm til spisslast',
         unit='kr',
-        yticksuffix=' kr',
+        ylabel='Kostnad (kr)',
+        yticksuffix=None,
         ymin=0,
         ymax=ymax_costs,
         height=250,
@@ -114,10 +122,59 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
         building_instance.dict_operation_costs['heatpump_consumption_peak_array'],
         'Strøm til spisslast',
         unit='kr',
-        yticksuffix=' kr',
+        ylabel='Kostnad (kr)',
+        yticksuffix=None,
         ymin=0,
         ymax=ymax_costs,
         height=250,
+        colors=("#367061", "#8ec9b9")
+    )
+    figure_flow_temperature = visualization_instance.plot_hourly_series(
+        geoenergy_instance.flow_temperature_array,
+        'Turtemperatur, varmesystem',
+        unit='°C',
+        linemode=True,
+        ymin=30,
+        ymax=50,
+        ylabel='Temperatur (°C)',
+        showlegend=False,
+        yticksuffix=None,
+        height=150,
+        colors=("#367061", "#8ec9b9")
+    )
+    figure_outdoor_temperature = visualization_instance.plot_hourly_series(
+        building_instance.temperature_array,
+        'Utetemperatur',
+        unit='°C',
+        linemode=True,
+        ymin=-40,
+        ymax=40,
+        ylabel='Utetemperatur (°C)',
+        showlegend=False,
+        yticksuffix=None,
+        height=150,
+        colors=("#367061", "#8ec9b9")
+    )
+    figure_well_temperature = visualization_instance.plot_hourly_series(
+        geoenergy_instance.fluid_temperature[8760*12:8760*13],
+        'Brønntemperatur, år 12 - 13',
+        unit='°C',
+        linemode=True,
+        ylabel='Brønntemperatur, år 12 - 13 (°C)',
+        showlegend=False,
+        yticksuffix=None,
+        height=150,
+        colors=("#367061", "#8ec9b9")
+    )
+    figure_cop = visualization_instance.plot_hourly_series(
+        geoenergy_instance.cop_array,
+        'COP',
+        unit='-',
+        linemode=True,
+        ylabel='COP',
+        showlegend=False,
+        yticksuffix=None,
+        height=150,
         colors=("#367061", "#8ec9b9")
     )
     st.header('1) Energibehov')
@@ -144,17 +201,12 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
     st.subheader('Energiflyt')
     st.plotly_chart(figure_geoenergy, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
     with st.expander("Detaljerte figurer", expanded=False):
-        st.caption("Turtemperatur, varmesystem")
-        st.line_chart(geoenergy_instance.flow_temperature_array, height=150)
-        st.caption("Utetemperatur")
-        st.line_chart(building_instance.temperature_array, height=150)
-        st.caption("Brønntemperatur, år 12-13")
-        st.line_chart(geoenergy_instance.fluid_temperature[8760*12:8760*13], height=150)
+        st.plotly_chart(figure_flow_temperature, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
+        st.plotly_chart(figure_outdoor_temperature, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
+        st.plotly_chart(figure_well_temperature, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
         st.pyplot(geoenergy_instance.field, use_container_width=True)
-#        st.caption("Brønntemperatur")
-#        st.line_chart(geoenergy_instance.fluid_temperature, height=150)
         st.caption("COP")
-        st.line_chart(geoenergy_instance.cop_array, height=150)
+        st.plotly_chart(figure_cop, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
         st.metric('Gjennomsnittlig COP', value = round(np.mean(geoenergy_instance.cop_array),1))
     st.subheader('Investering')
     c1, c2 = st.columns(2)
@@ -217,7 +269,7 @@ ROMOPPVARMING_COP = 3.5
 ROMOPPVARMING_DEKNINGSGRAD = 95
 TAPPEVANN_COP = 3.5
 TAPPEVANN_DEKNINGSGRAD = 90
-BYGNINGSSTANDARD = st.selectbox('Bygningsstandard', options=['Middels energieffektivt'])
+BYGNINGSSTANDARD = 'Middels energieffektivt'
 TEMPERATUR = st.selectbox('Temperaturår', options=['2022-2023', '2021-2022', '2020-2021', '2019-2020'])
 SPOT_YEAR = st.selectbox('Spotprisår', options=[2023, 2022, 2021])
 SPOT_REGION = 'NO3'
