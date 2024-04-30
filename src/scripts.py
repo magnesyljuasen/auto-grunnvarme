@@ -264,9 +264,9 @@ class GeoEnergy:
     
     def set_simulation_parameters(self):
         self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MIN = np.array([-5, -2, 0, 2, 5, 10, 15])
-        self.TECHNICAL_SHEET_COP_MIN = np.array([3.68, 4.03, 4.23, 4.41, 4.56, 5.04, 5.42])
+        self.TECHNICAL_SHEET_COP_MIN = np.array([3.68, 4.03, 4.23, 4.41, 4.56, 5.04, 5.42]) - 0.5
         self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MAX = np.array([-2, 0, 2, 5, 10, 15])
-        self.TECHNICAL_SHEET_COP_MAX = np.array([3.3, 3.47, 3.61, 3.77, 4.11, 4.4])
+        self.TECHNICAL_SHEET_COP_MAX = np.array([3.3, 3.47, 3.61, 3.77, 4.11, 4.4]) - 0.5
 
         self.SIMULATION_PERIOD = 25
         self.THERMAL_CONDUCTIVITY = 3.5
@@ -389,10 +389,10 @@ class HeatPump:
         self.dhw_demand = dhw_demand
         
     def set_simulation_parameters(self):
-        self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MIN = np.array([-5, -2, 0, 2, 5, 10, 15])
-        self.TECHNICAL_SHEET_COP_MIN = np.array([3.68, 4.03, 4.23, 4.41, 4.56, 5.04, 5.42]) - 2
-        self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MAX = np.array([-2, 0, 2, 5, 10, 15])
-        self.TECHNICAL_SHEET_COP_MAX = np.array([3.3, 3.47, 3.61, 3.77, 4.11, 4.4]) - 2
+        self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MIN = np.array([-20, -15, -10, -7, 2, 7, 10, 18])
+        self.TECHNICAL_SHEET_COP_MIN = np.array([2.16, 2.48, 2.83, 3.06, 3.79, 4.13, 4.6, 5.31]) - 1.3
+        self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MAX = np.array([-20, -15, -10, -7, 2, 7, 10, 18])
+        self.TECHNICAL_SHEET_COP_MAX = np.array([1.8, 2.06, 2.36, 2.56, 3.04, 3.33, 3.66, 4.17]) - 1.3
 
     def _calculate_cop(self, source_temperature, SLOPE_FLOW_TEMPERATURE_MIN, SLOPE_FLOW_TEMPERATURE_MAX, INTERSECT_FLOW_TEMPERATURE_MIN, INTERSECT_FLOW_TEMPERATURE_MAX, flow_temperature_array, FLOW_TEMPERATURE_MAX, FLOW_TEMPERATURE_MIN):
         cop_array = np.zeros(8760)
@@ -656,7 +656,8 @@ class Visualization:
         linemode=False,
         xtick_datemode=True,
         yticksuffix=' kW',
-        unit='kW'
+        unit='kW',
+        export_name = None
     ):
         if unit == 'kW':
             unit_sum = 'kWh/år'
@@ -701,7 +702,7 @@ class Visualization:
                     )
                 )
         fig.update_layout(
-            legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.01, bgcolor="rgba(0,0,0,0)", font=dict(size=16)),
+            legend=dict(yanchor="top", y=0.98, xanchor="left", x=0.01, bgcolor="rgba(0,0,0,0)", font=dict(size=16), orientation="h"),
             height=height,
             xaxis_title=xlabel, 
             yaxis_title=ylabel,
@@ -730,4 +731,6 @@ class Visualization:
             #linecolor="black",
             #gridcolor="lightgrey",
         )
+        if export_name != None:
+            fig.write_image(f"src/plots/{export_name}.svg")
         return fig
