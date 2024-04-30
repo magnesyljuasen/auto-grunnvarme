@@ -77,7 +77,7 @@ class Building:
         self.roof_orientations = []
         self.profet_building_standard = [] # list of strings, for combination-buildings
         self.profet_building_type = [] # list of strings, , for combination-buildings
-        self.temperature_array = []
+        self.outdoor_temperature_array = []
         self.dict_energy = {}
 
 ################
@@ -126,7 +126,7 @@ class EnergyDemand:
             building_standard = self.building_instance.profet_building_standard[i]
             building_type = self.building_instance.profet_building_type[i]
             building_area = self.building_instance.area[i]
-            temperature_array = self.building_instance.temperature_array
+            temperature_array = self.building_instance.outdoor_temperature_array
 
             oauth = OAuth2Session(client=BackendApplicationClient(client_id="profet_2024"))
             predict = OAuth2Session(
@@ -188,7 +188,7 @@ class EnergyDemand:
         self.building_instance.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, self.building_instance.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE
         
     def _calculate_flow_temperature(self, OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE = 15, OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = -15, FLOW_TEMPERATURE_MIN = 35, FLOW_TEMPERATURE_MAX = 45):
-        outdoor_temperature_array = self.building_instance.temperature_array
+        outdoor_temperature_array = self.building_instance.outdoor_temperature_array
         flow_temperature = np.zeros(8760)
         for i in range(0, len(flow_temperature)):
             if outdoor_temperature_array[i] < OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE:
@@ -417,7 +417,7 @@ class HeatPump:
         slope_flow_temperature_min, intersect_flow_temperature_min = linear_regression(self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MIN, self.TECHNICAL_SHEET_COP_MIN)
         slope_flow_temperature_max, intersect_flow_temperature_max = linear_regression(self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MAX, self.TECHNICAL_SHEET_COP_MAX)
 
-        source_temperature = self.building_instance.temperature_array     
+        source_temperature = self.building_instance.outdoor_temperature_array     
         self.cop_array = self._calculate_cop(
             source_temperature=source_temperature,
             SLOPE_FLOW_TEMPERATURE_MIN=slope_flow_temperature_min,

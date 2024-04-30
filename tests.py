@@ -45,7 +45,7 @@ def energy_demand_tests():
     building_instance.area = [5000, 3000]
     df = pd.read_csv('src/testdata/temperatures_dummy.csv', sep=',', index_col=0)
     temperature_array = df['2021-2022'].to_list()
-    building_instance.temperature_array = temperature_array
+    building_instance.outdoor_temperature_array = temperature_array
     energydemand_instance = EnergyDemand(building_instance)
     energydemand_instance.profet_calculation()
     st.write(building_instance.dict_energy['spaceheating_array'])

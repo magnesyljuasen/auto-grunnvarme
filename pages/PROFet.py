@@ -103,7 +103,7 @@ if st.button("Kjør kode", key="2"):
     building_instance.area = [2000, 5000]
     df = pd.read_csv('src/testdata/temperatures_dummy.csv', sep=',', index_col=0)
     temperature_array = df['2021-2022'].to_list()
-    building_instance.temperature_array = temperature_array
+    building_instance.outdoor_temperature_array = temperature_array
     energydemand_instance = EnergyDemand(building_instance)
     energydemand_instance.profet_calculation()
     c1, c2, c3 = st.columns(3)

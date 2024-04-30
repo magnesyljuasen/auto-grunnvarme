@@ -9,13 +9,13 @@ st.write("Sjøsiden Hovde - Utregninger")
 
 def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOPPVARMING_COP, ROMOPPVARMING_DEKNINGSGRAD, TAPPEVANN_COP, TAPPEVANN_DEKNINGSGRAD, SPOT_YEAR, SPOT_REGION, SPOT_PAASLAG ):
     df = pd.read_excel('src/testdata/Beregninger - Sjøsiden Hovde.xlsx', sheet_name='Utetemperatur')
-    temperature_array = df[TEMPERATUR].tolist()
+    outdoor_temperature_array = list(df[TEMPERATUR])
     # Geoenergy
     building_instance = Building()
     building_instance.profet_building_standard = [BYGNINGSSTANDARD]
     building_instance.profet_building_type = [BYGNINGSTYPE]
     building_instance.area = [BYGNINGSAREAL]
-    building_instance.temperature_array = temperature_array
+    building_instance.outdoor_temperature_array = outdoor_temperature_array
     energydemand_instance = EnergyDemand(building_instance)
     energydemand_instance.profet_calculation()
     energydemand_instance.calcluate_flow_temperature()
@@ -263,8 +263,8 @@ selected_byggetrinn = st.radio('Velg byggetrinn', options=['Byggetrinn 2', 'Bygg
 if selected_byggetrinn == 'Byggetrinn 2':
     BYGNINGSAREAL = 2321
 else:
-    BYGNINGSAREAL = 2321 * 2
-BYGNINGSTYPE = 'Leilighet'
+    BYGNINGSAREAL = 5000
+BYGNINGSTYPE = 'Skole'
 ROMOPPVARMING_COP = 3.5
 ROMOPPVARMING_DEKNINGSGRAD = 95
 TAPPEVANN_COP = 3.5
