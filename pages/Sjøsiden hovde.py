@@ -143,7 +143,7 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
         colors=("#367061", "#8ec9b9")
     )
     figure_outdoor_temperature = visualization_instance.plot_hourly_series(
-        building_instance.temperature_array,
+        building_instance.outdoor_temperature_array,
         'Utetemperatur',
         unit='°C',
         linemode=True,
