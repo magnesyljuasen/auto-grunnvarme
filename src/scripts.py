@@ -114,7 +114,7 @@ class EnergyDemand:
     def set_electric_array(self, array):
         self.building_instance.dict_energy['electric_array'] = np.array(array)
 
-    def profet_calculation(self):
+    def profet_calculation(self, spaceheating_sum = None, dhw_sum = None, electric_sum = None):
         def get_secret(filename):
             with open(filename) as file:
                 secret = file.readline()
@@ -169,6 +169,16 @@ class EnergyDemand:
             else:
                 raise TypeError("PROFet virker ikke")
         
+        if spaceheating_sum != None:
+            spaceheating_factor = spaceheating_sum/np.sum(spaceheating_array)
+            spaceheating_array = spaceheating_array * spaceheating_factor
+        if dhw_sum != None:
+            dhw_factor = dhw_sum/np.sum(dhw_array)
+            dhw_array = dhw_array * dhw_factor
+        if electric_sum != None:
+            electric_factor = electric_sum/np.sum(electric_array)
+            electric_array = electric_array * electric_factor
+
         self.set_dhw_array(dhw_array)
         self.set_spaceheating_array(spaceheating_array)
         self.set_electric_array(electric_array)
@@ -264,9 +274,9 @@ class GeoEnergy:
     
     def set_simulation_parameters(self):
         self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MIN = np.array([-5, -2, 0, 2, 5, 10, 15])
-        self.TECHNICAL_SHEET_COP_MIN = np.array([3.68, 4.03, 4.23, 4.41, 4.56, 5.04, 5.42]) - 0.5
+        self.TECHNICAL_SHEET_COP_MIN = np.array([3.68, 4.03, 4.23, 4.41, 4.56, 5.04, 5.42]) - 0
         self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MAX = np.array([-2, 0, 2, 5, 10, 15])
-        self.TECHNICAL_SHEET_COP_MAX = np.array([3.3, 3.47, 3.61, 3.77, 4.11, 4.4]) - 0.5
+        self.TECHNICAL_SHEET_COP_MAX = np.array([3.3, 3.47, 3.61, 3.77, 4.11, 4.4]) - 0
 
         self.SIMULATION_PERIOD = 25
         self.THERMAL_CONDUCTIVITY = 3.5
@@ -390,9 +400,9 @@ class HeatPump:
         
     def set_simulation_parameters(self):
         self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MIN = np.array([-20, -15, -10, -7, 2, 7, 10, 18])
-        self.TECHNICAL_SHEET_COP_MIN = np.array([2.16, 2.48, 2.83, 3.06, 3.79, 4.13, 4.6, 5.31]) - 1.3
+        self.TECHNICAL_SHEET_COP_MIN = np.array([2.16, 2.48, 2.83, 3.06, 3.79, 4.13, 4.6, 5.31]) - 0
         self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MAX = np.array([-20, -15, -10, -7, 2, 7, 10, 18])
-        self.TECHNICAL_SHEET_COP_MAX = np.array([1.8, 2.06, 2.36, 2.56, 3.04, 3.33, 3.66, 4.17]) - 1.3
+        self.TECHNICAL_SHEET_COP_MAX = np.array([1.8, 2.06, 2.36, 2.56, 3.04, 3.33, 3.66, 4.17]) - 0
 
     def _calculate_cop(self, source_temperature, SLOPE_FLOW_TEMPERATURE_MIN, SLOPE_FLOW_TEMPERATURE_MAX, INTERSECT_FLOW_TEMPERATURE_MIN, INTERSECT_FLOW_TEMPERATURE_MAX, flow_temperature_array, FLOW_TEMPERATURE_MAX, FLOW_TEMPERATURE_MIN):
         cop_array = np.zeros(8760)
@@ -407,6 +417,72 @@ class HeatPump:
                 cop_interpolated = slope_interpolated * source_temperature[i] + intercept_interpolated
                 cop_array[i] = cop_interpolated
         return cop_array
+    
+    def nspek_heatpump_calculation(self):
+        outdoor_temperature_array = self.building_instance.outdoor_temperature_array
+        heating_demand_array = self.spaceheating_demand + self.dhw_demand
+        COP_NOMINAL = 5  # Nominell COP
+        temperature_datapoints = [-15, 2, 7] # SN- NSPEK 3031:2023 - tabell K.13
+        P_3031 = np.array([
+            [0.46, 0.72, 1],
+            [0.23, 0.36, 0.5],
+            [0.09, 0.14, 0.2]
+            ])
+        COP_3031 = np.array([
+            [0.44, 0.53, 0.64],
+            [0.61, 0.82, 0.9],
+            [0.55, 0.68, 0.82]
+            ])
+        P_3031_list = []
+        COP_3031_list = []
+        for i in range(0, len(temperature_datapoints)):
+            P_3031_list.append(np.polyfit(x = temperature_datapoints, y = P_3031[i], deg = 1))
+            COP_3031_list.append(np.polyfit(x = temperature_datapoints, y = COP_3031[i], deg = 1))
+
+        P_HP_DICT = []
+        COP_HP_DICT = []
+        INTERPOLATE_HP_DICT = []
+        for index, outdoor_temperature in enumerate(outdoor_temperature_array):
+            p_hp_list = np.array([np.polyval(P_3031_list[0], outdoor_temperature), np.polyval(P_3031_list[1], outdoor_temperature), np.polyval(P_3031_list[2], outdoor_temperature)])
+            cop_hp_list = np.array([np.polyval(COP_3031_list[0], outdoor_temperature), np.polyval(COP_3031_list[1], outdoor_temperature), np.polyval(COP_3031_list[2], outdoor_temperature)]) * COP_NOMINAL
+            interpolate_hp_list = np.polyfit(x = p_hp_list, y = cop_hp_list, deg = 0)[0]
+            #--
+            P_HP_DICT.append(p_hp_list)
+            COP_HP_DICT.append(cop_hp_list)
+            INTERPOLATE_HP_DICT.append(interpolate_hp_list)
+        #--
+        heatpump = np.zeros(8760)
+        cop = np.zeros(8760)
+        P_NOMINAL = np.max(heating_demand_array) * 0.5 # 50% effektdekningsgrad
+    #    if P_NOMINAL > 10: # ikke større varmepumpe enn 10 kW?
+    #        P_NOMINAL = 10
+        for i, outdoor_temperature in enumerate(outdoor_temperature_array):
+            effekt = heating_demand_array[i]
+            if outdoor_temperature < -15:
+                cop[i] = 1
+                heatpump[i] = 0
+            else:
+                varmepumpe_effekt_verdi = effekt
+                p_hp_list = P_HP_DICT[i] * P_NOMINAL
+                cop_hp_list = COP_HP_DICT[i]
+                if effekt >= p_hp_list[0]:
+                    varmepumpe_effekt_verdi = p_hp_list[0]
+                    cop_verdi = cop_hp_list[0]
+                elif effekt <= p_hp_list[2]:
+                    cop_verdi = cop_hp_list[2]
+                else:
+                    cop_verdi = INTERPOLATE_HP_DICT[i]
+                heatpump[i] = varmepumpe_effekt_verdi
+                cop[i] = cop_verdi
+        self.heatpump_array = heatpump
+        self.from_air_array = self.heatpump_array - self.heatpump_array / np.array(cop_verdi)
+        self.compressor_array = self.heatpump_array - self.from_air_array
+        self.peak_array = heating_demand_array - self.heatpump_array
+        self.cop_array = cop
+
+        self.building_instance.dict_energy['heatpump_production_array'] = -self.heatpump_array
+        self.building_instance.dict_energy['heatpump_consumption_compressor_array'] = self.compressor_array
+        self.building_instance.dict_energy['heatpump_consumption_peak_array'] = self.peak_array  
     
     def advanced_sizing_of_heat_pump(self):
         spaceheating_heatpump, spaceheating_peak = coverage_calculation(coverage_percentage=self.spaceheating_coverage, array=self.spaceheating_demand)
