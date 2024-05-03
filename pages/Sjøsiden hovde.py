@@ -27,7 +27,8 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
     geoenergy_instance.simple_coverage_cop_calculation()
     geoenergy_instance.calculate_heat_pump_size()
     geoenergy_instance.set_simulation_parameters()
-    geoenergy_instance.advanced_sizing_of_boreholes()
+    geoenergy_instance.advanced_sizing_of_boreholes(variable_cop_sizing=False)
+    #geoenergy_instance.simple_sizing_of_boreholes()
     geoenergy_instance.calculate_investment_costs()
     #--
     heatpump_instance = HeatPump(building_instance)
@@ -218,6 +219,7 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
     st.markdown('---')
     st.header('2) Bergvarme')
     st.subheader('Energiflyt')
+    pd.DataFrame({'a' : -geoenergy_instance.from_wells_array*1000}).to_csv('data.csv')
     st.plotly_chart(figure_geoenergy, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
     with st.expander("Detaljerte figurer", expanded=False):
         st.plotly_chart(figure_flow_temperature, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
@@ -226,7 +228,7 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
         st.pyplot(geoenergy_instance.field, use_container_width=True)
         st.caption("COP")
         st.plotly_chart(figure_cop_geoenergy, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
-        st.metric('Gjennomsnittlig COP', value = round(np.mean(geoenergy_instance.cop_array),1))
+        st.metric('SCOP', value = round(np.sum(geoenergy_instance.heatpump_array)/np.sum(geoenergy_instance.compressor_array),1))
     st.subheader('Investering')
     c1, c2 = st.columns(2)
     with c1:
@@ -251,7 +253,7 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
     with st.expander("Detaljerte figurer", expanded=False):
         st.caption("COP")
         st.plotly_chart(figure_cop_heatpump, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
-        st.metric('Gjennomsnittlig COP', value = round(np.mean(heatpump_instance.cop_array),1))
+        st.metric('SCOP', value = round(np.sum(heatpump_instance.heatpump_array)/np.sum(heatpump_instance.compressor_array),1))
     st.subheader('Investering')
     st.write('...')
     st.subheader('Driftskostnader')
@@ -301,12 +303,12 @@ else:
     BYGNINGSAREAL = 2321 * MULTIPLIER
 BYGNINGSTYPE = 'Leilighet'
 ROMOPPVARMING_COP = 3.5
-ROMOPPVARMING_DEKNINGSGRAD = 98
+ROMOPPVARMING_DEKNINGSGRAD = 98.8
 TAPPEVANN_COP = 2.5
-TAPPEVANN_DEKNINGSGRAD = 80
+TAPPEVANN_DEKNINGSGRAD = 90
 BYGNINGSSTANDARD = 'Middels energieffektivt'
 TEMPERATUR = st.selectbox('Temperaturår', options=['ØRLANDET', 'TRONDHEIM', '2022-2023', '2021-2022', '2020-2021', '2019-2020'])
-SPOT_YEAR = st.selectbox('Spotprisår', options=[2023, 2022, 2021])
+SPOT_YEAR = st.selectbox('Spotprisår', options=[2023, 2022, 2021, 2020])
 SPOT_REGION = 'NO3'
 SPOT_PAASLAG = 0
 

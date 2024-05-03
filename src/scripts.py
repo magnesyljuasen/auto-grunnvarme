@@ -421,23 +421,23 @@ class HeatPump:
     def nspek_heatpump_calculation(self):
         outdoor_temperature_array = self.building_instance.outdoor_temperature_array
         heating_demand_array = self.spaceheating_demand + self.dhw_demand
-        COP_NOMINAL = 5  # Nominell COP
-        temperature_datapoints = [-15, 2, 7] # SN- NSPEK 3031:2023 - tabell K.13
-        P_3031 = np.array([
-            [0.46, 0.72, 1],
-            [0.23, 0.36, 0.5],
-            [0.09, 0.14, 0.2]
+        COP_NOMINAL = 4.8  # Nominell COP
+        temperature_datapoints = [-15, 2, 7,] #15] # SN- NSPEK 3031:2023 - tabell K.13
+        P_3031_35 = np.array([
+            [0.48, 0.76, 1,], #1.25],
+            [0.24, 0.38, 0.5,], #0.62],
+            [0.12, 0.19, 0.25,]# 0.31]
             ])
-        COP_3031 = np.array([
-            [0.44, 0.53, 0.64],
-            [0.61, 0.82, 0.9],
-            [0.55, 0.68, 0.82]
+        COP_3031_35 = np.array([
+            [0.5, 0.69, 0.99,], #1.19],
+            [0.51, 0.73, 1,], #1.24],
+            [0.45, 0.65, 0.93,] #1.13]
             ])
         P_3031_list = []
         COP_3031_list = []
         for i in range(0, len(temperature_datapoints)):
-            P_3031_list.append(np.polyfit(x = temperature_datapoints, y = P_3031[i], deg = 1))
-            COP_3031_list.append(np.polyfit(x = temperature_datapoints, y = COP_3031[i], deg = 1))
+            P_3031_list.append(np.polyfit(x = temperature_datapoints, y = P_3031_35[i], deg = 1))
+            COP_3031_list.append(np.polyfit(x = temperature_datapoints, y = COP_3031_35[i], deg = 1))
 
         P_HP_DICT = []
         COP_HP_DICT = []
@@ -453,7 +453,8 @@ class HeatPump:
         #--
         heatpump = np.zeros(8760)
         cop = np.zeros(8760)
-        P_NOMINAL = np.max(heating_demand_array) * 0.5 # 50% effektdekningsgrad
+        P_NOMINAL = 32
+        #P_NOMINAL = np.max(heating_demand_array) * 0.5 # 50% effektdekningsgrad
     #    if P_NOMINAL > 10: # ikke større varmepumpe enn 10 kW?
     #        P_NOMINAL = 10
         for i, outdoor_temperature in enumerate(outdoor_temperature_array):
