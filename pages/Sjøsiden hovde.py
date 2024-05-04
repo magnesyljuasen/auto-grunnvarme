@@ -16,7 +16,7 @@ def calculation(TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOP
     building_instance.profet_building_standard = [BYGNINGSSTANDARD]
     building_instance.profet_building_type = [BYGNINGSTYPE]
     building_instance.area = [BYGNINGSAREAL]
-    building_instance.outdoor_temperature_array = outdoor_temperature_array
+    building_instance.outdoor_temperature_array = outdoor_temperature_array 
     energydemand_instance = EnergyDemand(building_instance)
     energydemand_instance.profet_calculation(spaceheating_sum=128167 * MULTIPLIER, dhw_sum=42722 * MULTIPLIER)
     energydemand_instance.calcluate_flow_temperature()
