@@ -7,59 +7,13 @@ from oauthlib.oauth2 import BackendApplicationClient
 import numpy_financial as npf
 from sklearn.linear_model import LinearRegression
 from GHEtool import Borefield, GroundConstantTemperature, HourlyGeothermalLoad, HourlyGeothermalLoadMultiYear
+from src.scripts.utilities import linear_interpolation, linear_regression, coverage_calculation
 import pygfunction as gt
 import datetime
 import plotly.graph_objects as go
 ##
 import streamlit as st
 ##
-
-def linear_interpolation(x, x1, x2, y1, y2):
-    y = y1 + (x - x1) * (y2 - y1) / (x2 - x1)
-    return y
-
-def linear_regression(x, y):
-    x = x.reshape((-1, 1))
-    model = LinearRegression()
-    model.fit(x, y)
-    model = LinearRegression().fit(x, y)
-    r_sq = model.score(x, y)
-    y_pred = model.predict(x)
-    y_pred = model.intercept_ + np.sum(model.coef_ * x, axis=1)
-    linear_y = model.predict(x)
-    slope = (linear_y[-1]-linear_y[0])/(x[-1]-x[0])
-    intersect = linear_y[-1]-slope*x[-1]
-    return slope, intersect
-
-
-def coverage_calculation(coverage_percentage, array):
-    if coverage_percentage == 100:
-        return array, np.zeros(8760)
-    elif coverage_percentage == 0:
-        return np.zeros(8760), array
-    array_sorted = np.sort(array)
-    timeserie_sum = np.sum(array)
-    timeserie_N = len(array)
-    startpunkt = timeserie_N // 2
-    i = 0
-    avvik = 0.0001
-    pm = 2 + avvik
-    while abs(pm - 1) > avvik:
-        cutoff = array_sorted[startpunkt]
-        array_tmp = np.where(array > cutoff, cutoff, array)
-        beregnet_dekningsgrad = (np.sum(array_tmp) / timeserie_sum) * 100
-        pm = beregnet_dekningsgrad / coverage_percentage
-        gammelt_startpunkt = startpunkt
-        if pm < 1:
-            startpunkt = startpunkt + timeserie_N // 2 ** (i + 2) - 1
-        else:
-            startpunkt = startpunkt - timeserie_N // 2 ** (i + 2) - 1
-        if startpunkt == gammelt_startpunkt:
-            break
-        i += 1
-        if i > 13:
-            break
-    return array_tmp, array - array_tmp
 
 ################
 
@@ -79,6 +33,7 @@ class Building:
         self.profet_building_type = [] # list of strings, , for combination-buildings
         self.outdoor_temperature_array = []
         self.dict_energy = {}
+        self.dict_operation_costs = {}
 
 ################
 
@@ -183,30 +138,24 @@ class EnergyDemand:
         self.set_spaceheating_array(spaceheating_array)
         self.set_electric_array(electric_array)
 
-    def calcluate_flow_temperature(self):
-        self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = 15, -15
-        self.FLOW_TEMPERATURE_MIN, self.FLOW_TEMPERATURE_MAX = 35, 45
-
-        self.flow_temperature_array = self._calculate_flow_temperature(
-            OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE=self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE,
-            OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE=self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE,
-            FLOW_TEMPERATURE_MIN=self.FLOW_TEMPERATURE_MIN,
-            FLOW_TEMPERATURE_MAX=self.FLOW_TEMPERATURE_MAX)
-        
+    def calcluate_flow_temperature(self, OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE = 15, OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = -15, FLOW_TEMPERATURE_MIN = 35, FLOW_TEMPERATURE_MAX = 45):
+        self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE
+        self.FLOW_TEMPERATURE_MIN, self.FLOW_TEMPERATURE_MAX = FLOW_TEMPERATURE_MIN, FLOW_TEMPERATURE_MAX
+        self.flow_temperature_array = self._calculate_flow_temperature()
         self.building_instance.flow_temperature_array = self.flow_temperature_array
         self.building_instance.FLOW_TEMPERATURE_MIN, self.building_instance.FLOW_TEMPERATURE_MAX = self.FLOW_TEMPERATURE_MIN, self.FLOW_TEMPERATURE_MAX
         self.building_instance.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, self.building_instance.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE
         
-    def _calculate_flow_temperature(self, OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE = 15, OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = -15, FLOW_TEMPERATURE_MIN = 35, FLOW_TEMPERATURE_MAX = 45):
+    def _calculate_flow_temperature(self):
         outdoor_temperature_array = self.building_instance.outdoor_temperature_array
         flow_temperature = np.zeros(8760)
         for i in range(0, len(flow_temperature)):
-            if outdoor_temperature_array[i] < OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE:
-                flow_temperature[i] = FLOW_TEMPERATURE_MAX
-            elif outdoor_temperature_array[i] > OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE:
-                flow_temperature[i] = FLOW_TEMPERATURE_MIN
+            if outdoor_temperature_array[i] < self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE:
+                flow_temperature[i] = self.FLOW_TEMPERATURE_MAX
+            elif outdoor_temperature_array[i] > self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE:
+                flow_temperature[i] = self.FLOW_TEMPERATURE_MIN
             else:
-                flow_temperature[i] = linear_interpolation(outdoor_temperature_array[i], OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE, OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, FLOW_TEMPERATURE_MAX, FLOW_TEMPERATURE_MIN)
+                flow_temperature[i] = linear_interpolation(outdoor_temperature_array[i], self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE, self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, self.FLOW_TEMPERATURE_MAX, self.FLOW_TEMPERATURE_MIN)
         return flow_temperature
 
 ################
@@ -279,8 +228,8 @@ class GeoEnergy:
         self.TECHNICAL_SHEET_COP_MAX = np.array([3.3, 3.47, 3.61, 3.77, 4.11, 4.4]) - 0
 
         self.SIMULATION_PERIOD = 25
-        self.THERMAL_CONDUCTIVITY = 3.5
-        self.UNDISTRUBED_GROUND_TEMPERATURE = 8
+        self.THERMAL_CONDUCTIVITY = 3.0
+        self.UNDISTRUBED_GROUND_TEMPERATURE = 9
         self.BOREHOLE_EQUIVALENT_RESISTANCE = 0.12
         self.MAX_ALLOWED_FLUID_TEMPERATURE = 16
         self.MIN_ALLOWED_FLUID_TEMPERATURE = 0
@@ -418,7 +367,7 @@ class HeatPump:
                 cop_array[i] = cop_interpolated
         return cop_array
     
-    def nspek_heatpump_calculation(self):
+    def nspek_heatpump_calculation(self, P_NOMINAL, power_reduction = 0, cop_reduction = 0):
         outdoor_temperature_array = self.building_instance.outdoor_temperature_array
         heating_demand_array = self.spaceheating_demand + self.dhw_demand
         COP_NOMINAL = 4.8  # Nominell COP
@@ -453,7 +402,7 @@ class HeatPump:
         #--
         heatpump = np.zeros(8760)
         cop = np.zeros(8760)
-        P_NOMINAL = 32
+        P_NOMINAL = P_NOMINAL
         #P_NOMINAL = np.max(heating_demand_array) * 0.5 # 50% effektdekningsgrad
     #    if P_NOMINAL > 10: # ikke større varmepumpe enn 10 kW?
     #        P_NOMINAL = 10
@@ -467,12 +416,21 @@ class HeatPump:
                 p_hp_list = P_HP_DICT[i] * P_NOMINAL
                 cop_hp_list = COP_HP_DICT[i]
                 if effekt >= p_hp_list[0]:
-                    varmepumpe_effekt_verdi = p_hp_list[0]
-                    cop_verdi = cop_hp_list[0]
+                    varmepumpe_effekt_verdi = p_hp_list[0] - (p_hp_list[0]*power_reduction/100)
+                    if outdoor_temperature > -5 and outdoor_temperature < 5:
+                        cop_verdi = cop_hp_list[0] - (cop_hp_list[0]*cop_reduction/100)
+                    else:
+                        cop_verdi = cop_hp_list[0]
                 elif effekt <= p_hp_list[2]:
-                    cop_verdi = cop_hp_list[2]
+                    if outdoor_temperature > -5 and outdoor_temperature < 5:
+                        cop_verdi = cop_hp_list[2] - (cop_hp_list[2]*cop_reduction/100)
+                    else:
+                        cop_verdi = cop_hp_list[2]
                 else:
-                    cop_verdi = INTERPOLATE_HP_DICT[i]
+                    if outdoor_temperature > -5 and outdoor_temperature < 5:
+                        cop_verdi = INTERPOLATE_HP_DICT[i] - (INTERPOLATE_HP_DICT[i] * cop_reduction/100)
+                    else:
+                        cop_verdi = INTERPOLATE_HP_DICT[i]
                 heatpump[i] = varmepumpe_effekt_verdi
                 cop[i] = cop_verdi
         self.heatpump_array = heatpump

@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from src.scripts import Building, EnergyDemand, GeoEnergy, SolarPanels, HeatPump, DistrictHeating, OperationCosts, GreenEnergyFund
+from src.scripts.scripts import Building, EnergyDemand, GeoEnergy, SolarPanels, HeatPump, DistrictHeating, OperationCosts, GreenEnergyFund
 
 st.write("Integrert serviettkalkyle")
 st.code("""
