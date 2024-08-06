@@ -353,6 +353,19 @@ class HeatPump:
         self.TECHNICAL_SHEET_FLUID_TEMPERATURE_MAX = np.array([-20, -15, -10, -7, 2, 7, 10, 18])
         self.TECHNICAL_SHEET_COP_MAX = np.array([1.8, 2.06, 2.36, 2.56, 3.04, 3.33, 3.66, 4.17]) - 0
 
+        self.P_3031_35 = np.array([
+            [0.48, 0.76, 1,], #1.25],
+            [0.24, 0.38, 0.5,], #0.62],
+            [0.12, 0.19, 0.25,]# 0.31]
+            ])
+        self.COP_3031_35 = np.array([
+            [0.5, 0.69, 0.99,], #1.19],
+            [0.51, 0.73, 1,], #1.24],
+            [0.45, 0.65, 0.93,] #1.13]
+            ])
+        
+        self.COP_NOMINAL = 4.8
+
     def _calculate_cop(self, source_temperature, SLOPE_FLOW_TEMPERATURE_MIN, SLOPE_FLOW_TEMPERATURE_MAX, INTERSECT_FLOW_TEMPERATURE_MIN, INTERSECT_FLOW_TEMPERATURE_MAX, flow_temperature_array, FLOW_TEMPERATURE_MAX, FLOW_TEMPERATURE_MIN):
         cop_array = np.zeros(8760)
         for i in range(0, len(cop_array)):
@@ -370,18 +383,11 @@ class HeatPump:
     def nspek_heatpump_calculation(self, P_NOMINAL, power_reduction = 0, cop_reduction = 0):
         outdoor_temperature_array = self.building_instance.outdoor_temperature_array
         heating_demand_array = self.spaceheating_demand + self.dhw_demand
-        COP_NOMINAL = 4.8  # Nominell COP
+        COP_NOMINAL = self.COP_NOMINAL  # Nominell COP
         temperature_datapoints = [-15, 2, 7,] #15] # SN- NSPEK 3031:2023 - tabell K.13
-        P_3031_35 = np.array([
-            [0.48, 0.76, 1,], #1.25],
-            [0.24, 0.38, 0.5,], #0.62],
-            [0.12, 0.19, 0.25,]# 0.31]
-            ])
-        COP_3031_35 = np.array([
-            [0.5, 0.69, 0.99,], #1.19],
-            [0.51, 0.73, 1,], #1.24],
-            [0.45, 0.65, 0.93,] #1.13]
-            ])
+        P_3031_35 = self.P_3031_35
+        COP_3031_35 = self.COP_3031_35
+        
         P_3031_list = []
         COP_3031_list = []
         for i in range(0, len(temperature_datapoints)):
@@ -417,17 +423,17 @@ class HeatPump:
                 cop_hp_list = COP_HP_DICT[i]
                 if effekt >= p_hp_list[0]:
                     varmepumpe_effekt_verdi = p_hp_list[0] - (p_hp_list[0]*power_reduction/100)
-                    if outdoor_temperature > -5 and outdoor_temperature < 5:
+                    if outdoor_temperature > -2 and outdoor_temperature < 7:
                         cop_verdi = cop_hp_list[0] - (cop_hp_list[0]*cop_reduction/100)
                     else:
                         cop_verdi = cop_hp_list[0]
                 elif effekt <= p_hp_list[2]:
-                    if outdoor_temperature > -5 and outdoor_temperature < 5:
+                    if outdoor_temperature > -2 and outdoor_temperature < 7:
                         cop_verdi = cop_hp_list[2] - (cop_hp_list[2]*cop_reduction/100)
                     else:
                         cop_verdi = cop_hp_list[2]
                 else:
-                    if outdoor_temperature > -5 and outdoor_temperature < 5:
+                    if outdoor_temperature > -2 and outdoor_temperature < 7:
                         cop_verdi = INTERPOLATE_HP_DICT[i] - (INTERPOLATE_HP_DICT[i] * cop_reduction/100)
                     else:
                         cop_verdi = INTERPOLATE_HP_DICT[i]
