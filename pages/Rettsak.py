@@ -24,7 +24,6 @@ def calculation(NAME, WATERBORNE_HEAT_ON, TEMPERATUR, BYGNINGSSTANDARD, BYGNINGS
     geoenergy_instance = GeoEnergy(building_instance)
     geoenergy_instance.set_base_parameters(spaceheating_cop=ROMOPPVARMING_COP, spaceheating_coverage=ROMOPPVARMING_DEKNINGSGRAD, dhw_cop=TAPPEVANN_COP, dhw_coverage=TAPPEVANN_DEKNINGSGRAD)
     geoenergy_instance.set_demand(spaceheating_demand=building_instance.dict_energy['spaceheating_array'], dhw_demand=building_instance.dict_energy['dhw_array'])
-    geoenergy_instance.set_demand(spaceheating_demand=building_instance.dict_energy['spaceheating_array'] + building_instance.dict_energy['dhw_array'], dhw_demand=np.zeros(8760))
     geoenergy_instance.simple_coverage_cop_calculation()
     geoenergy_instance.calculate_heat_pump_size()
     geoenergy_instance.set_simulation_parameters()
@@ -281,6 +280,7 @@ def calculation(NAME, WATERBORNE_HEAT_ON, TEMPERATUR, BYGNINGSSTANDARD, BYGNINGS
         'Spisslast_grunnvarme' : (geoenergy_instance.peak_array),
          }).to_csv(f'timeserier_{selected_byggetrinn}.csv')
     st.plotly_chart(figure_geoenergy, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
+    st.metric('Energidekningsgrad [%]', value=round((geoenergy_instance.heatpump_array.sum() / (building_instance.dict_energy['spaceheating_array'] + building_instance.dict_energy['dhw_array']).sum())*100))
     with st.expander("Detaljerte figurer", expanded=False):
         st.plotly_chart(figure_flow_temperature, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
         st.plotly_chart(figure_outdoor_temperature, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
@@ -316,7 +316,7 @@ def calculation(NAME, WATERBORNE_HEAT_ON, TEMPERATUR, BYGNINGSSTANDARD, BYGNINGS
     st.header('3) Luft-vann-varmepumpe')
     st.subheader('Energiflyt')
     st.plotly_chart(figure_heatpump, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
-    st.metric('Energidekningsgrad', value=round((heatpump_instance.heatpump_array.sum() / (building_instance.dict_energy['spaceheating_array'] + building_instance.dict_energy['dhw_array']).sum())*100))
+    st.metric('Energidekningsgrad [%]', value=round((heatpump_instance.heatpump_array.sum() / (building_instance.dict_energy['spaceheating_array'] + building_instance.dict_energy['dhw_array']).sum())*100))
     
     with st.expander("Detaljerte figurer", expanded=False):
         st.caption("COP")
@@ -406,7 +406,7 @@ YEARS = 40
 DISKONTERINGSRENTE = 4
 BYGNINGSTYPE = 'Hus'
 ROMOPPVARMING_COP = 3.5
-ROMOPPVARMING_DEKNINGSGRAD = 100
+ROMOPPVARMING_DEKNINGSGRAD = 99
 TAPPEVANN_COP = 2.5
 TAPPEVANN_DEKNINGSGRAD = 100
 BYGNINGSSTANDARD = 'Lite energieffektivt'
