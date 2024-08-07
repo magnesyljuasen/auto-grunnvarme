@@ -67,6 +67,7 @@ def calculation(factor_air_water, factor_air_air, NAME, WATERBORNE_HEAT_ON, TEMP
             ])
         
         heatpump_instance.nspek_heatpump_calculation(P_NOMINAL=P_NOMINAL * factor_air_air * MULTIPLIER, power_reduction=power_reduction, cop_reduction=cop_reduction, coverage=100)
+        building_instance.dict_energy['heatpump_consumption_peak_array'] = building_instance.dict_energy['heatpump_consumption_peak_array'] + building_instance.dict_energy['dhw_array']
         #heatpump_instance.advanced_sizing_of_heat_pump()
         st.write(f'Luft-luft varmepumpe {P_NOMINAL * factor_air_air} kW')
 
