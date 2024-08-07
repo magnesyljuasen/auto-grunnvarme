@@ -10,10 +10,9 @@ st.write("Rettsak - Utregninger")
 
 st.info('Totalt behov (inkl. elspesifikt) bør være ca. likt det som er i excel-arket (dersom det ikke er eksisterende tiltak)')
 st.info('Avriming mellom -2 og +7 grader eller -5 og +5 grader (har mye å si for SCOP)?')
-st.info('Varmepumpestørrelse er lik i alle beregningene')
 st.warning('Hvordan løser vi luft-luft? Det kommer for bra ut her. Bør justere for planløsning? Hva er reinvesteringsintervall og hvor mye er investering på?')
 
-def calculation(NAME, WATERBORNE_HEAT_ON, TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOPPVARMING_COP, ROMOPPVARMING_DEKNINGSGRAD, TAPPEVANN_COP, TAPPEVANN_DEKNINGSGRAD, SPOT_YEAR, SPOT_REGION, SPOT_PAASLAG, power_reduction, cop_reduction, MULTIPLIER = 1):
+def calculation(factor_air_water, factor_air_air, NAME, WATERBORNE_HEAT_ON, TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOPPVARMING_COP, ROMOPPVARMING_DEKNINGSGRAD, TAPPEVANN_COP, TAPPEVANN_DEKNINGSGRAD, SPOT_YEAR, SPOT_REGION, SPOT_PAASLAG, power_reduction, cop_reduction, MULTIPLIER = 1):
     df = pd.read_excel('src/testdata/Beregninger - Sjøsiden Hovde.xlsx', sheet_name='Utetemperatur')
     cooling_array = pd.read_excel('src/testdata/cooling_sheet.xlsx')['Hus_Oslo'].to_numpy()
     outdoor_temperature_array = list(df[TEMPERATUR])
@@ -27,7 +26,7 @@ def calculation(NAME, WATERBORNE_HEAT_ON, TEMPERATUR, BYGNINGSSTANDARD, BYGNINGS
     energydemand_instance.profet_calculation()
     energydemand_instance.calcluate_flow_temperature()
     geoenergy_instance = GeoEnergy(building_instance)
-    geoenergy_instance.set_base_parameters(spaceheating_cop=ROMOPPVARMING_COP, spaceheating_coverage=ROMOPPVARMING_DEKNINGSGRAD, dhw_cop=TAPPEVANN_COP, dhw_coverage=TAPPEVANN_DEKNINGSGRAD)
+    geoenergy_instance.set_base_parameters(spaceheating_cop=ROMOPPVARMING_COP, spaceheating_coverage=100, dhw_cop=TAPPEVANN_COP, dhw_coverage=TAPPEVANN_DEKNINGSGRAD)
     geoenergy_instance.set_demand(spaceheating_demand=building_instance.dict_energy['spaceheating_array'], dhw_demand=building_instance.dict_energy['dhw_array'])
     geoenergy_instance.simple_coverage_cop_calculation()
     geoenergy_instance.calculate_heat_pump_size()
@@ -44,14 +43,15 @@ def calculation(NAME, WATERBORNE_HEAT_ON, TEMPERATUR, BYGNINGSSTANDARD, BYGNINGS
     #--
     if heatpump_type == 'Luft-vann':
         heatpump_instance = HeatPump(building_instance)
-        heatpump_instance.set_base_parameters(spaceheating_cop=ROMOPPVARMING_COP, spaceheating_coverage=ROMOPPVARMING_DEKNINGSGRAD, dhw_cop=TAPPEVANN_COP, dhw_coverage=TAPPEVANN_DEKNINGSGRAD)
+        heatpump_instance.set_base_parameters(spaceheating_cop=ROMOPPVARMING_COP, spaceheating_coverage=100, dhw_cop=TAPPEVANN_COP, dhw_coverage=TAPPEVANN_DEKNINGSGRAD)
         heatpump_instance.set_demand(spaceheating_demand=building_instance.dict_energy['spaceheating_array'], dhw_demand=building_instance.dict_energy['dhw_array'])
         heatpump_instance.set_simulation_parameters()
-        heatpump_instance.nspek_heatpump_calculation(P_NOMINAL=P_NOMINAL * MULTIPLIER, power_reduction=power_reduction, cop_reduction=cop_reduction)
+        heatpump_instance.nspek_heatpump_calculation(P_NOMINAL=P_NOMINAL * factor_air_water * MULTIPLIER, power_reduction=power_reduction, cop_reduction=cop_reduction, coverage=100)
         #heatpump_instance.advanced_sizing_of_heat_pump()
+        st.write(f'Luft-vann varmepumpe {P_NOMINAL * factor_air_water} kW')
     elif heatpump_type == 'Luft-luft':
         heatpump_instance = HeatPump(building_instance)
-        heatpump_instance.set_base_parameters(spaceheating_cop=ROMOPPVARMING_COP, spaceheating_coverage=ROMOPPVARMING_DEKNINGSGRAD, dhw_cop=TAPPEVANN_COP, dhw_coverage=TAPPEVANN_DEKNINGSGRAD)
+        #heatpump_instance.set_base_parameters(spaceheating_cop=ROMOPPVARMING_COP, spaceheating_coverage=ROMOPPVARMING_DEKNINGSGRAD, dhw_cop=TAPPEVANN_COP, dhw_coverage=TAPPEVANN_DEKNINGSGRAD)
         heatpump_instance.set_demand(spaceheating_demand=building_instance.dict_energy['spaceheating_array'], dhw_demand=np.zeros(8760))
         heatpump_instance.set_simulation_parameters()
         heatpump_instance.P_3031_35 = np.array([
@@ -66,8 +66,10 @@ def calculation(NAME, WATERBORNE_HEAT_ON, TEMPERATUR, BYGNINGSSTANDARD, BYGNINGS
             [0.55, 0.68, 0.82]
             ])
         
-        heatpump_instance.nspek_heatpump_calculation(P_NOMINAL=P_NOMINAL * MULTIPLIER, power_reduction=power_reduction, cop_reduction=cop_reduction)
+        heatpump_instance.nspek_heatpump_calculation(P_NOMINAL=P_NOMINAL * factor_air_air * MULTIPLIER, power_reduction=power_reduction, cop_reduction=cop_reduction, coverage=100)
         #heatpump_instance.advanced_sizing_of_heat_pump()
+        st.write(f'Luft-luft varmepumpe {P_NOMINAL * factor_air_air} kW')
+
     #--
     operation_costs_instance = OperationCosts(building_instance)
     operation_costs_instance.set_spotprice_array(year=SPOT_YEAR, region=SPOT_REGION, surcharge=SPOT_PAASLAG)
@@ -416,7 +418,9 @@ def calculation(NAME, WATERBORNE_HEAT_ON, TEMPERATUR, BYGNINGSSTANDARD, BYGNINGS
     if heatpump_type == 'Luft-vann':
         investment_cost_heatpump = (building_instance.geoenergy_investment_cost_heat_pump + building_instance.geoenergy_investment_cost_borehole)*0.76
     else:
-        investment_cost_heatpump = (building_instance.geoenergy_investment_cost_heat_pump + building_instance.geoenergy_investment_cost_borehole)*0.3
+        #st.write(P_NOMINAL * factor_air_air)
+        #investment_cost_heatpump = (building_instance.geoenergy_investment_cost_heat_pump + building_instance.geoenergy_investment_cost_borehole)*0.3
+        investment_cost_heatpump = 30000
     return {
         'Investering bergvarme-VP' : building_instance.geoenergy_investment_cost_heat_pump,
         f'Investering {heatpump_type.lower()}-VP' : investment_cost_heatpump,
@@ -439,7 +443,7 @@ YEARS = 40
 DISKONTERINGSRENTE = 4
 BYGNINGSTYPE = 'Hus'
 ROMOPPVARMING_COP = 3.5
-ROMOPPVARMING_DEKNINGSGRAD = 99
+ROMOPPVARMING_DEKNINGSGRAD = 100
 TAPPEVANN_COP = 2.5
 TAPPEVANN_DEKNINGSGRAD = 100
 BYGNINGSSTANDARD = 'Lite energieffektivt'
@@ -448,14 +452,18 @@ SPOT_YEAR = st.selectbox('Spotprisår', options=[2023, 2022, 2021, 2020])
 SPOT_REGION = 'NO1'
 SPOT_PAASLAG = 0
 
-power_reduction = st.number_input('Prosentvis reduksjon i effekt', value = 40, min_value=0, max_value=100)
-cop_reduction = st.number_input('Prosentvis reduksjon i COP', value = 40, min_value=0, max_value=100)
+factor_air_water = st.number_input('Luft-vann (reduksjon i P_nominal)', value=0.7)
+factor_air_air = st.number_input('Luft-luft (reduksjon i P_nominal)', value=0.3)
+power_reduction = st.number_input('Prosentvis reduksjon i effekt', value = 20, min_value=0, max_value=100)
+cop_reduction = st.number_input('Prosentvis reduksjon i COP', value = 20, min_value=0, max_value=100)
 WATERBORNE_HEAT_ON = st.toggle('Vannbåren varme?', value=True)
 heatpump_type = st.selectbox('Varmepumpe', options=['Luft-vann', 'Luft-luft'])
 
 if st.button('Start beregning'):
     with st.spinner('Beregner...'):
         result_map = calculation(
+            factor_air_water,
+            factor_air_air,
             NAME,
             WATERBORNE_HEAT_ON,
             TEMPERATUR,
@@ -500,7 +508,7 @@ if st.button('Start beregning'):
                 if i == 15 or i == 30 or i == 45 or i == 60:
                     investment_air_water_list[i] = result_map[f'Investering {heatpump_type.lower()}-VP']
             elif heatpump_type == 'Luft-luft':
-                if i == 5 or i == 10 or i == 15 or i == 20 or i == 25 or i == 30 or i == 35 or i == 40 or i == 45 or i == 50 or i == 55 or i == 60:
+                if i == 10 or i == 20 or i == 30 or i == 40 or i == 50 or i == 60:
                     investment_air_water_list[i] = result_map[f'Investering {heatpump_type.lower()}-VP']
             if i == 20 or i == 40 or i == 60:
                 investment_geoenergy_list[i] = result_map['Investering bergvarme-VP']

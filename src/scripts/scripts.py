@@ -232,7 +232,7 @@ class GeoEnergy:
         self.UNDISTRUBED_GROUND_TEMPERATURE = 8
         self.BOREHOLE_EQUIVALENT_RESISTANCE = 0.12
         self.MAX_ALLOWED_FLUID_TEMPERATURE = 16
-        self.MIN_ALLOWED_FLUID_TEMPERATURE = 0
+        self.MIN_ALLOWED_FLUID_TEMPERATURE = -2
         self.DISTANCE_BETWEEN_WELLS = 15
         self.TARGET_DEPTH = 300
 
@@ -380,9 +380,10 @@ class HeatPump:
                 cop_array[i] = cop_interpolated
         return cop_array
     
-    def nspek_heatpump_calculation(self, P_NOMINAL, power_reduction = 0, cop_reduction = 0):
+    def nspek_heatpump_calculation(self, P_NOMINAL, power_reduction = 0, cop_reduction = 0, coverage=95):
+        
         outdoor_temperature_array = self.building_instance.outdoor_temperature_array
-        heating_demand_array = self.spaceheating_demand + self.dhw_demand
+        heating_demand_array, b = coverage_calculation(coverage_percentage=coverage, array=np.array(self.spaceheating_demand + self.dhw_demand))
         COP_NOMINAL = self.COP_NOMINAL  # Nominell COP
         temperature_datapoints = [-15, 2, 7,] #15] # SN- NSPEK 3031:2023 - tabell K.13
         P_3031_35 = self.P_3031_35
@@ -423,17 +424,17 @@ class HeatPump:
                 cop_hp_list = COP_HP_DICT[i]
                 if effekt >= p_hp_list[0]:
                     varmepumpe_effekt_verdi = p_hp_list[0] - (p_hp_list[0]*power_reduction/100)
-                    if outdoor_temperature > -2 and outdoor_temperature < 7:
+                    if outdoor_temperature > -5 and outdoor_temperature < 5:
                         cop_verdi = cop_hp_list[0] - (cop_hp_list[0]*cop_reduction/100)
                     else:
                         cop_verdi = cop_hp_list[0]
                 elif effekt <= p_hp_list[2]:
-                    if outdoor_temperature > -2 and outdoor_temperature < 7:
+                    if outdoor_temperature > -5 and outdoor_temperature < 5:
                         cop_verdi = cop_hp_list[2] - (cop_hp_list[2]*cop_reduction/100)
                     else:
                         cop_verdi = cop_hp_list[2]
                 else:
-                    if outdoor_temperature > -2 and outdoor_temperature < 7:
+                    if outdoor_temperature > -5 and outdoor_temperature < 5:
                         cop_verdi = INTERPOLATE_HP_DICT[i] - (INTERPOLATE_HP_DICT[i] * cop_reduction/100)
                     else:
                         cop_verdi = INTERPOLATE_HP_DICT[i]
