@@ -452,7 +452,9 @@ if __name__ == "__main__":
     BUILDING_STANDARD = 'Lite energieffektivt'
     BUILDING_TYPE = 'Hus'
     BUILDING_AREA = st.number_input(label = 'Areal', value=291, step=10)
-    WATERBORNE_HEATING_COST = st.number_input(label='Vannbåren varme (kr)', value=20000 + 815 * BUILDING_AREA)
+    WATERBORNE_COST = 20000 + 815 * BUILDING_AREA
+    WATERBORNE_COST = 566 * BUILDING_AREA
+    WATERBORNE_HEATING_COST = st.number_input(label='Vannbåren varme (kr)', value=WATERBORNE_COST)
     c1, c2 = st.columns(2)
     with c1:
         SPOT_YEAR = st.number_input(label='Spotprisår', value=2023)
