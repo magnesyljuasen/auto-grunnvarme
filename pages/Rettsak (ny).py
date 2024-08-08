@@ -9,20 +9,20 @@ def economic_comparison(df):
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.write('Bergvarme')
-        st.metric(label='LCOE', value=df['LCOE grunnvarme'][0])
-        st.metric(label='Totalkostnad', value=df['Totalkostnad grunnvarme'][0])
+        st.metric(label='LCOE (kr/kWh)', value=df['LCOE grunnvarme'][0])
+        st.metric(label='Totalkostnad (kr)', value=df['Totalkostnad grunnvarme'][0])
     with c2:
         st.write('Luft-vann')
-        st.metric(label='LCOE', value=df['LCOE luft-vann'][0])
-        st.metric(label='Totalkostnad', value=df['Totalkostnad luft-vann'][0])
+        st.metric(label='LCOE (kr/kWh)', value=df['LCOE luft-vann'][0])
+        st.metric(label='Totalkostnad (kr)', value=df['Totalkostnad luft-vann'][0])
     with c3:
         st.write('Luft-luft')
-        st.metric(label='LCOE', value=df['LCOE luft-luft'][0])
-        st.metric(label='Totalkostnad', value=df['Totalkostnad luft-luft'][0])
+        st.metric(label='LCOE (kr/kWh)', value=df['LCOE luft-luft'][0])
+        st.metric(label='Totalkostnad (kr)', value=df['Totalkostnad luft-luft'][0])
     with c4:
         st.write('Direkte elektrisk')
-        st.metric(label='LCOE', value=df['LCOE_direkte_el'][0])
-        st.metric(label='Totalkostnad', value=df['Totalkostnad direkte elektrisk'][0])
+        st.metric(label='LCOE (kr/kWh)', value=df['LCOE_direkte_el'][0])
+        st.metric(label='Totalkostnad (kr)', value=df['Totalkostnad direkte elektrisk'][0])
 
     compared_data = {
         "luft-vann": df['Totalkostnad luft-vann'][0] - df['Totalkostnad grunnvarme'][0],
@@ -115,7 +115,7 @@ def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENT
         'Kostnad grunnvarme' : cost_geoenergy_list,
         'Kostnad luft-vann-VP' : cost_air_water_list,
         'Kostnad luft-luft-VP' : cost_air_air_list,
-        'Kostnad direkte elektrisk' : cost_direct_el_diskontert_list,
+        'Kostnad direkte elektrisk' : cost_direct_el_list,
         'Kostnad grunnvarme (diskontert)' : cost_geoenergy_diskontert_list,
         'Kostnad luft-vann-VP (diskontert)' : cost_air_water_diskontert_list,
         'Kostnad luft-luft-VP (diskontert)' : cost_air_air_diskontert_list,
@@ -449,20 +449,27 @@ def display_energy_effect(building_instance):
 
 
 if __name__ == "__main__":
+    st.title('Beregninger til rettsak')
+    st.info('1) Tilpasse energibehov. Til målte data om det finnes | Hvis ikke; bruke areal og bygningsår.')
+    st.info('2) Velge dekningsgrader. Forslag (bergvarme = 100%, luft-vann = 85 %, luft-luft = 35%)')
+    st.info('3) Velge strømpris. Forslag (spotpris fra 2023 m/ nettleie også en økning som tilsvarer NVE sin 40% økning i strømpris mot 2051(?))')
+    st.info('4) Andre betraktninger; hva velger vi av levetid og diskonteringsrente?')
+
     BUILDING_STANDARD = 'Lite energieffektivt'
     BUILDING_TYPE = 'Hus'
-    BUILDING_AREA = st.number_input(label = 'Areal', value=291, step=10)
+    BUILDING_AREA = st.number_input(label = 'Areal (m2)', value=200, step=10)
     WATERBORNE_COST = 20000 + 815 * BUILDING_AREA
     WATERBORNE_COST = 566 * BUILDING_AREA
     WATERBORNE_HEATING_COST = st.number_input(label='Vannbåren varme (kr)', value=WATERBORNE_COST)
     c1, c2 = st.columns(2)
     with c1:
         SPOT_YEAR = st.number_input(label='Spotprisår', value=2023)
-        FLAT_EL_PRICE = st.number_input(label='Flat strømpris?', value=0)
+        with st.expander('Flat strømpris'):
+            FLAT_EL_PRICE = st.number_input(label='Flat strømpris?', value=0)
     with c2:
         DISKONTERINGSRENTE = st.number_input('Diskonteringsrente', value=4.0, step=0.1)
         YEARS = st.number_input('Levetid', value=40, step=1)
-        PERCENTAGE_INCREASE = (st.number_input('Prosentvis økning i strømpris (%)', value = 2, min_value=0, max_value=10))/100 + 1
+        PERCENTAGE_INCREASE = (st.number_input('Prosentvis økning i strømpris per år (%)', value = 1.5, min_value=0.0, max_value=10.0))/100 + 1
 
     with st.expander('Spotpris'):
         operation_costs_instance_plot = OperationCosts(Building())
