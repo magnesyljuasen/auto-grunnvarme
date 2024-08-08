@@ -12,7 +12,7 @@ st.info('Totalt behov (inkl. elspesifikt) bør være ca. likt det som er i excel
 st.info('Avriming mellom -2 og +7 grader eller -5 og +5 grader (har mye å si for SCOP)?')
 st.warning('Hvordan løser vi luft-luft? Det kommer for bra ut her. Bør justere for planløsning? Hva er reinvesteringsintervall og hvor mye er investering på?')
 
-def calculation(factor_air_water, factor_air_air, NAME, WATERBORNE_HEAT_ON, TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOPPVARMING_COP, ROMOPPVARMING_DEKNINGSGRAD, TAPPEVANN_COP, TAPPEVANN_DEKNINGSGRAD, SPOT_YEAR, SPOT_REGION, SPOT_PAASLAG, power_reduction, cop_reduction, MULTIPLIER = 1):
+def calculation(PERCENTAGE_INCREASE, factor_air_water, factor_air_air, NAME, WATERBORNE_HEAT_ON, TEMPERATUR, BYGNINGSSTANDARD, BYGNINGSTYPE, BYGNINGSAREAL, ROMOPPVARMING_COP, ROMOPPVARMING_DEKNINGSGRAD, TAPPEVANN_COP, TAPPEVANN_DEKNINGSGRAD, SPOT_YEAR, SPOT_REGION, SPOT_PAASLAG, power_reduction, cop_reduction, MULTIPLIER = 1):
     df = pd.read_excel('src/testdata/Beregninger - Sjøsiden Hovde.xlsx', sheet_name='Utetemperatur')
     cooling_array = pd.read_excel('src/testdata/cooling_sheet.xlsx')['Hus_Oslo'].to_numpy()
     outdoor_temperature_array = list(df[TEMPERATUR])
@@ -34,6 +34,9 @@ def calculation(factor_air_water, factor_air_air, NAME, WATERBORNE_HEAT_ON, TEMP
     geoenergy_instance.advanced_sizing_of_boreholes(variable_cop_sizing=True)
     #geoenergy_instance.simple_sizing_of_boreholes()
     geoenergy_instance.calculate_investment_costs()
+
+    GEOENERGY_ELECTRICITY = geoenergy_instance.compressor_array + geoenergy_instance.peak_array
+
     P_NOMINAL = geoenergy_instance.heat_pump_size
     cooling_demand = BYGNINGSAREAL * cooling_array
     if WATERBORNE_HEAT_ON:
@@ -71,22 +74,42 @@ def calculation(factor_air_water, factor_air_air, NAME, WATERBORNE_HEAT_ON, TEMP
         #heatpump_instance.advanced_sizing_of_heat_pump()
         st.write(f'Luft-luft varmepumpe {P_NOMINAL * factor_air_air} kW')
 
+    HEATPUMP_ELECTRICITY = heatpump_instance.compressor_array + heatpump_instance.peak_array
+
     #--
+    building_instance.dict_energy['geoenergy_consumption_array'] = GEOENERGY_ELECTRICITY
+    building_instance.dict_energy['heatpump_consumption_array'] = HEATPUMP_ELECTRICITY
+
     operation_costs_instance = OperationCosts(building_instance)
     operation_costs_instance.set_spotprice_array(year=SPOT_YEAR, region=SPOT_REGION, surcharge=SPOT_PAASLAG)
     operation_costs_instance.set_network_tariffs()
     operation_costs_instance.set_network_energy_component()
     operation_costs_instance.get_operation_costs()
 
+    c1, c2 = st.columns(2)
+    with c1:
+        st.write('GRUNNVARME')
+        st.write(np.sum(operation_costs_instance.building_instance.dict_energy['geoenergy_consumption_array']))
+        st.line_chart((operation_costs_instance.building_instance.dict_energy['geoenergy_consumption_array']))
+        st.write(np.sum(operation_costs_instance.building_instance.dict_operation_costs['geoenergy_consumption_array']))
+        st.write(np.sum(operation_costs_instance.building_instance.dict_operation_costs['geoenergy_consumption_array']/np.sum(operation_costs_instance.building_instance.dict_energy['geoenergy_consumption_array'])))
+    with c2:
+        st.write('VP')
+        st.write(np.sum(operation_costs_instance.building_instance.dict_energy['heatpump_consumption_array']))
+        st.line_chart((operation_costs_instance.building_instance.dict_energy['heatpump_consumption_array']))
+        st.write(np.sum(operation_costs_instance.building_instance.dict_operation_costs['heatpump_consumption_array']))
+        st.write(np.sum(operation_costs_instance.building_instance.dict_operation_costs['heatpump_consumption_array'])/np.sum(operation_costs_instance.building_instance.dict_energy['heatpump_consumption_array']))
+
+
     green_energy_fund_instance = GreenEnergyFund(building_instance)
     green_energy_fund_instance.set_economic_parameters(
         investering_borehole=geoenergy_instance.investment_cost_borehole, 
         investering_øvrig=geoenergy_instance.investment_cost_heat_pump,
-        driftskostnad_per_år=(building_instance.dict_operation_costs['geoenergy_consumption_compressor_array'] + building_instance.dict_operation_costs['geoenergy_consumption_peak_array']).sum())
+        driftskostnad_per_år=(building_instance.dict_operation_costs['geoenergy_consumption_array']).sum())
     green_energy_fund_instance.set_energy_parameters(
         produced_heat=building_instance.dict_energy['geoenergy_production_array'].sum(),
         produced_heat_value=building_instance.dict_operation_costs['geoenergy_production_array'].sum(),
-        consumed_electricity_cost=(building_instance.dict_operation_costs['geoenergy_consumption_compressor_array']  + building_instance.dict_operation_costs['geoenergy_consumption_peak_array']).sum()
+        consumed_electricity_cost=(building_instance.dict_operation_costs['geoenergy_consumption_array']).sum()
     )
     green_energy_fund_instance.calculation_15_year(leasingavgift_år_1=round(green_energy_fund_instance.INVESTERING*0.102), amortering_lån_år=15)
     #-- results
@@ -115,6 +138,7 @@ def calculation(factor_air_water, factor_air_air, NAME, WATERBORNE_HEAT_ON, TEMP
         height=500,
         colors=("#1d3c34", "#48a23f", "#FFC358")
     )
+
     figure_heatpump = visualization_instance.plot_hourly_series(
         heatpump_instance.compressor_array,
         'Strøm til varmepumpe',
@@ -127,11 +151,10 @@ def calculation(factor_air_water, factor_air_air, NAME, WATERBORNE_HEAT_ON, TEMP
         height=500,
         colors=("#1d3c34", "#48a23f", "#FFC358")
     )
+
     ymax_costs = np.max(building_instance.dict_operation_costs['dhw_array'] + building_instance.dict_operation_costs['spaceheating_array'])
     figure_cost_direct_electric_heating = visualization_instance.plot_hourly_series(
-        building_instance.dict_operation_costs['dhw_array'],
-        'Strøm til tappevann',
-        building_instance.dict_operation_costs['spaceheating_array'],
+        building_instance.dict_operation_costs['heating_array'],
         'Strøm til romoppvarming',
         unit='kr',
         ylabel='Kostnad (kr)',
@@ -142,11 +165,12 @@ def calculation(factor_air_water, factor_air_air, NAME, WATERBORNE_HEAT_ON, TEMP
         colors=("#367061", "#8ec9b9"),
         export_name='Grunnvarme'
     )
+    
     figure_cost_geoenergy = visualization_instance.plot_hourly_series(
-        building_instance.dict_operation_costs['geoenergy_consumption_compressor_array'],
-        'Strøm til varmepumpe',
-        building_instance.dict_operation_costs['geoenergy_consumption_peak_array'],
-        'Strøm til spisslast',
+        building_instance.dict_operation_costs['geoenergy_consumption_array'],
+        'Strøm til varmepumpe + spisslast',
+        #building_instance.dict_operation_costs['geoenergy_consumption_peak_array'],
+        #'Strøm til spisslast',
         unit='kr',
         ylabel='Kostnad (kr)',
         yticksuffix=None,
@@ -156,10 +180,8 @@ def calculation(factor_air_water, factor_air_air, NAME, WATERBORNE_HEAT_ON, TEMP
         colors=("#367061", "#8ec9b9")
     )
     figure_cost_heatpump = visualization_instance.plot_hourly_series(
-        building_instance.dict_operation_costs['heatpump_consumption_compressor_array'],
-        'Strøm til varmepumpe',
-        building_instance.dict_operation_costs['heatpump_consumption_peak_array'],
-        'Strøm til spisslast',
+        building_instance.dict_operation_costs['heatpump_consumption_array'],
+        'Strøm til varmepumpe + spisslast',
         unit='kr',
         ylabel='Kostnad (kr)',
         yticksuffix=None,
@@ -339,7 +361,7 @@ def calculation(factor_air_water, factor_air_air, NAME, WATERBORNE_HEAT_ON, TEMP
     st.subheader('Driftskostnader')
     st.write('**Bergvarme**')
     st.plotly_chart(figure_cost_geoenergy, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
-    geoenergy_operation_costs_per_year = round(np.sum(building_instance.dict_operation_costs['geoenergy_consumption_compressor_array'] + building_instance.dict_operation_costs['geoenergy_consumption_peak_array']))
+    geoenergy_operation_costs_per_year = round(np.sum(building_instance.dict_operation_costs['geoenergy_consumption_array']))
     st.metric(f'Driftskostnad for **bergvarme**', value = f'{geoenergy_operation_costs_per_year:,} kr/år'.replace(',', ' '))
     #    st.subheader('Serviettkalkyle')
 #    st.write(f"IRR: **{round(green_energy_fund_instance.irr_value_15*100, 3)} %**")
@@ -359,12 +381,12 @@ def calculation(factor_air_water, factor_air_air, NAME, WATERBORNE_HEAT_ON, TEMP
     st.subheader('Driftskostnader')
     st.write(f'**{heatpump_type}-varmepumpe**')
     st.plotly_chart(figure_cost_heatpump, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
-    geoenergy_operation_costs_per_year = round(np.sum(building_instance.dict_operation_costs['heatpump_consumption_compressor_array'] + building_instance.dict_operation_costs['heatpump_consumption_peak_array']))
+    geoenergy_operation_costs_per_year = round(np.sum(building_instance.dict_operation_costs['heatpump_consumption_array']))
     st.metric(f'Driftskostnad for **{heatpump_type.lower()}-varmepumpe**', value = f'{geoenergy_operation_costs_per_year:,} kr/år'.replace(',', ' '))
     st.header('4) Direkte elektrisk oppvarming')
     st.subheader('Driftskostnader')
     st.plotly_chart(figure_cost_direct_electric_heating, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
-    electric_operation_costs_per_year = round(np.sum(building_instance.dict_operation_costs['spaceheating_array'] + building_instance.dict_operation_costs['dhw_array']))
+    electric_operation_costs_per_year = round(np.sum(building_instance.dict_operation_costs['heating_array']))
     st.metric(f'Driftskostnad for **direkte elektrisk oppvarming**', value = f'{electric_operation_costs_per_year:,} kr/år'.replace(',', ' '))
 
     
@@ -376,20 +398,20 @@ def calculation(factor_air_water, factor_air_air, NAME, WATERBORNE_HEAT_ON, TEMP
     with c1:
         st.metric('Strøm for **direkte elektrisk oppvarming**', value = f'{dhw_energy_per_year + spaceheating_energy_per_year:,} kWh/år'.replace(',', ' '))
     with c2:
-        kWh_air_water = round(np.sum(building_instance.dict_energy['heatpump_consumption_compressor_array'] + building_instance.dict_energy['heatpump_consumption_peak_array']))
+        kWh_air_water = round(np.sum(building_instance.dict_energy['heatpump_consumption_array']))
         st.metric(f'Strøm for **{heatpump_type.lower()}-varmepumpe**', value = f'{kWh_air_water:,} kWh'.replace(',', ' '))
     with c3:
-        kWh_geoenergy = round(np.sum(building_instance.dict_energy['geoenergy_consumption_compressor_array'] + building_instance.dict_energy['geoenergy_consumption_peak_array']))
+        kWh_geoenergy = round(np.sum(building_instance.dict_energy['geoenergy_consumption_array']))
         st.metric(f'Strøm for **bergvarme**', value = f'{kWh_geoenergy:,} kWh'.replace(',', ' '))    
     #--
     with c1:
-        cost_el = round(np.sum(building_instance.dict_operation_costs['spaceheating_array'] + building_instance.dict_operation_costs['dhw_array']))
+        cost_el = round(np.sum(building_instance.dict_operation_costs['heating_array']))
         st.metric(f'Driftskostnad for **direkte elektrisk oppvarming**', value = f'{electric_operation_costs_per_year:,} kr/år'.replace(',', ' '))
     with c2:
-        cost_air_water = round(np.sum(building_instance.dict_operation_costs['heatpump_consumption_compressor_array'] + building_instance.dict_operation_costs['heatpump_consumption_peak_array']))
+        cost_air_water = round(np.sum(building_instance.dict_operation_costs['heatpump_consumption_array']))
         st.metric(f'Driftskostnad for **{heatpump_type.lower()}-varmepumpe**', value = f'{cost_air_water:,} kr/år'.replace(',', ' '))
     with c3:
-        cost_geoenergy = round(np.sum(building_instance.dict_operation_costs['geoenergy_consumption_compressor_array'] + building_instance.dict_operation_costs['geoenergy_consumption_peak_array']))
+        cost_geoenergy = round(np.sum(building_instance.dict_operation_costs['geoenergy_consumption_array']))
         st.metric(f'Driftskostnad for **bergvarme**', value = f'{cost_geoenergy:,} kr/år'.replace(',', ' '))
     #--
     
@@ -408,9 +430,9 @@ def calculation(factor_air_water, factor_air_air, NAME, WATERBORNE_HEAT_ON, TEMP
         f'{heatpump_type}, fra luft (kWh)' : heatpump_instance.from_air_array,
         f'{heatpump_type}, spisslast (kWh)' : heatpump_instance.peak_array,
         f'{heatpump_type}, COP' : heatpump_instance.cop_array,
-        'Direkte elektrisk, strømkostnad (kr)' : building_instance.dict_operation_costs['dhw_array'] + building_instance.dict_operation_costs['spaceheating_array'],
-        'Grunnvarme, strømkostnad (kr)' : building_instance.dict_operation_costs['geoenergy_consumption_compressor_array'] + building_instance.dict_operation_costs['geoenergy_consumption_peak_array'],
-        f'{heatpump_type}, strømkostnad (kr)' : building_instance.dict_operation_costs['heatpump_consumption_compressor_array'] + building_instance.dict_operation_costs['heatpump_consumption_peak_array'],
+        'Direkte elektrisk, strømkostnad (kr)' : building_instance.dict_operation_costs['heating_array'],
+        'Grunnvarme, strømkostnad (kr)' : building_instance.dict_operation_costs['geoenergy_consumption_array'],
+        f'{heatpump_type}, strømkostnad (kr)' : building_instance.dict_operation_costs['heatpump_consumption_array'],
         'Brønntemperatur år 12 - 13 (grader)' : geoenergy_instance.fluid_temperature[8760*12:8760*13],
         'Spotpris (kr)' : operation_costs_instance.spotprice_array
     })
@@ -440,7 +462,7 @@ MULTIPLIER = 1
 NAME = st.text_input('Skriv inn adresse')
 BYGNINGSAREAL = st.number_input('Areal', value=200)
 #P_NOMINAL = st.number_input('Nominell P', value=10)
-YEARS = 40
+YEARS = st.number_input('Antall år', value=40, step=10)
 DISKONTERINGSRENTE = 4
 BYGNINGSTYPE = 'Hus'
 ROMOPPVARMING_COP = 3.5
@@ -452,9 +474,11 @@ TEMPERATUR = st.selectbox('Temperaturår', options=['Blindern', 'Oslo', 'ØRLAND
 SPOT_YEAR = st.selectbox('Spotprisår', options=[2023, 2022, 2021, 2020])
 SPOT_REGION = 'NO1'
 SPOT_PAASLAG = 0
+PERCENTAGE_INCREASE = st.number_input('Prosentvis økning i strømpris (%)', value = 2, min_value=0, max_value=10)
+PERCENTAGE_INCREASE = 1 + (PERCENTAGE_INCREASE/100)
 
-factor_air_water = st.number_input('Luft-vann (reduksjon i P_nominal)', value=0.7)
-factor_air_air = st.number_input('Luft-luft (reduksjon i P_nominal)', value=0.3)
+factor_air_water = st.number_input('Luft-vann (reduksjon i P_nominal)', value=0.65)
+factor_air_air = st.number_input('Luft-luft (reduksjon i P_nominal)', value=0.17)
 power_reduction = st.number_input('Prosentvis reduksjon i effekt', value = 20, min_value=0, max_value=100)
 cop_reduction = st.number_input('Prosentvis reduksjon i COP', value = 20, min_value=0, max_value=100)
 WATERBORNE_HEAT_ON = st.toggle('Vannbåren varme?', value=True)
@@ -463,6 +487,7 @@ heatpump_type = st.selectbox('Varmepumpe', options=['Luft-vann', 'Luft-luft'])
 if st.button('Start beregning'):
     with st.spinner('Beregner...'):
         result_map = calculation(
+            PERCENTAGE_INCREASE,
             factor_air_water,
             factor_air_air,
             NAME,
@@ -498,9 +523,9 @@ if st.button('Start beregning'):
             year_list[i] = i
             if i != 0:
                 produced_energy_list[i] = result_map['Strøm direkte elektrisk']
-                energy_cost_geoenergy_list[i] = result_map['Kostnad grunnvarme']
-                energy_cost_air_water_list[i] = result_map[f'Kostnad {heatpump_type.lower()}-varmepumpe']
-                cost_direct_el_list[i] = result_map['Kostnad direkte elektrisk']
+                energy_cost_geoenergy_list[i] = result_map['Kostnad grunnvarme'] * PERCENTAGE_INCREASE**i
+                energy_cost_air_water_list[i] = result_map[f'Kostnad {heatpump_type.lower()}-varmepumpe'] * PERCENTAGE_INCREASE**i
+                cost_direct_el_list[i] = result_map['Kostnad direkte elektrisk'] * PERCENTAGE_INCREASE**i
 
             if i == 0:
                 investment_geoenergy_list[i] = result_map['Investering bergvarme-VP'] + result_map['Investering bergvarme brønner'] + result_map['Vannbåren varme']

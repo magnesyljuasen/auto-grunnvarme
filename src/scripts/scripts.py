@@ -138,6 +138,8 @@ class EnergyDemand:
         self.set_spaceheating_array(spaceheating_array)
         self.set_electric_array(electric_array)
 
+        self.building_instance.dict_energy['heating_array'] = np.array(dhw_array + spaceheating_array)
+
     def calcluate_flow_temperature(self, OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE = 15, OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = -15, FLOW_TEMPERATURE_MIN = 35, FLOW_TEMPERATURE_MAX = 45):
         self.OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, self.OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE = OUTDOOR_TEMPERATURE_AT_MIN_FLOW_TEMPERATURE, OUTDOOR_TEMPERATURE_AT_MAX_FLOW_TEMPERATURE
         self.FLOW_TEMPERATURE_MIN, self.FLOW_TEMPERATURE_MAX = FLOW_TEMPERATURE_MIN, FLOW_TEMPERATURE_MAX
@@ -195,7 +197,8 @@ class GeoEnergy:
 
         self.building_instance.dict_energy['geoenergy_production_array'] = -self.heatpump_array
         self.building_instance.dict_energy['geoenergy_consumption_compressor_array'] = self.compressor_array
-        self.building_instance.dict_energy['geoenergy_consumption_peak_array'] = self.peak_array  
+        self.building_instance.dict_energy['geoenergy_consumption_peak_array'] = self.peak_array
+        self.building_instance.dict_energy['geoenergy_consumption_array'] = self.peak_array + self.compressor_array    
 
     def calculate_heat_pump_size(self):
         heat_pump_size = round(np.max(self.heatpump_array))
@@ -448,7 +451,8 @@ class HeatPump:
 
         self.building_instance.dict_energy['heatpump_production_array'] = -self.heatpump_array
         self.building_instance.dict_energy['heatpump_consumption_compressor_array'] = self.compressor_array
-        self.building_instance.dict_energy['heatpump_consumption_peak_array'] = self.peak_array  
+        self.building_instance.dict_energy['heatpump_consumption_peak_array'] = self.peak_array
+        self.building_instance.dict_energy['heatpump_consumption_array'] = self.peak_array + self.compressor_array    
     
     def advanced_sizing_of_heat_pump(self):
         spaceheating_heatpump, spaceheating_peak = coverage_calculation(coverage_percentage=self.spaceheating_coverage, array=self.spaceheating_demand)
@@ -549,11 +553,11 @@ class OperationCosts:
                 elif 25 < average_max_value <= 50:
                     cost = 1225
                 elif 50 < average_max_value <= 75:
-                    cost = 1800
+                    cost = 1800 
                 elif 75 < average_max_value <= 100:
-                    cost = 2375
+                    cost = 2375 
                 elif average_max_value > 100:
-                    cost = 4750
+                    cost = 4750 
                 else:
                     cost = 0
                 cost_per_hour = cost/(index-previous_index)

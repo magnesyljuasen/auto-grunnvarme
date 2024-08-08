@@ -2,10 +2,10 @@
 Romoppvarming_sum,25036
 Tappevann_sum,3161
 DirekteElektrisk_sum,28198
-Levert_fra_luft_sum,15051
-Kompressor_luft_sum,9171
-Spisslast_luft_sum,3975
-Strøm_luft_sum,13146
+Levert_fra_luft_sum,14469
+Kompressor_luft_sum,8816
+Spisslast_luft_sum,4911
+Strøm_luft_sum,13728
 Levert_fra_brønn_sum,21114
 Kompressor_grunnvarme_sum,7083
 Strøm_grunnvarme_sum,7083
@@ -14,9 +14,9 @@ Romoppvarming_maks,8
 Tappevann_maks,0
 DirekteElektrisk_maks,9
 Levert_fra_luft_maks,3
-Kompressor_luft_maks,2
+Kompressor_luft_maks,1
 Strøm_luft_maks,7
-Spisslast_luft_maks,6
+Spisslast_luft_maks,7
 Levert_fra_brønn_maks,6
 Kompressor_grunnvarme_maks,2
 Strøm_grunnvarme_maks,2
