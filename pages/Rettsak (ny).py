@@ -705,6 +705,8 @@ if __name__ == "__main__":
         df_to_excel = df_to_excel.astype(int)
         st.write(df_to_excel)
 
+st.write('test')
+
 
 # 10000 for væske vann
 # 10000 for vannbåren varme
