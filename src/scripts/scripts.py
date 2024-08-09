@@ -498,9 +498,6 @@ class OperationCosts:
         df = pd.read_csv(filepath_or_buffer=f'src/data/spotprices_{year}.csv', sep=';', index_col=0)
         self.spotprice_array = np.array(list(df[region])) + surcharge
 
-    def set_network_tarrifs(self):
-        pass
-
     def set_network_energy_component(self):
         hours_in_year = pd.date_range(start='2023-01-01 00:00:00', end='2023-12-31 23:00:00', freq='h')
         network_energy_array = np.zeros(8760)
@@ -567,19 +564,40 @@ class OperationCosts:
         return series_list
 
     def set_network_tariffs(self):
-        # utbedre
-        pass     
+        self.NETTLEIE = 1
 
     def calculate_operation_costs(self, array):
+        st.write('Spot')
         spotcosts_array = self.spotprice_array * array # spotpris
+        st.write(np.sum(spotcosts_array))
+        #st.write(np.sum(spotcosts_array)/np.sum(array))
+        st.markdown('---')
+        st.write('Energiledd')
         network_energycosts_array = self.network_energy_array * array # energiledd
+        st.write(np.sum(network_energycosts_array))
+        #st.write(np.sum(network_energycosts_array)/np.sum(array))
         network_capacitycosts_array = self._network_capacity_component(array) # kapasitetsledd
+        st.markdown('---')
+        st.write('Kapasitetsledd')
+        st.write(np.sum(network_capacitycosts_array))
+        #st.write(np.sum(network_capacitycosts_array)/np.sum(array))
         return spotcosts_array + network_energycosts_array + network_capacitycosts_array
+    
+    def calculate_operation_costs_fast_nettleie(self, array):
+        elprice_array = self.spotprice_array + self.NETTLEIE
+        elcost_array = (elprice_array) * array # spotpris + nettleie
+        #network_energycosts_array = self.network_energy_array * array # energiledd
+        #network_capacitycosts_array = self._network_capacity_component(array) # kapasitetsledd
+        return elcost_array
 
-    def get_operation_costs(self):
+    def get_operation_costs(self, nettleie=True):
         dict_operation_costs = {}
         for key, array in self.building_instance.dict_energy.items():
-            dict_operation_costs[key] = self.calculate_operation_costs(array)
+            if nettleie == True:
+                dict_operation_costs[key] = self.calculate_operation_costs(array)
+            else:
+                dict_operation_costs[key] = self.calculate_operation_costs_fast_nettleie(array)
+
         self.building_instance.dict_operation_costs = dict_operation_costs
 
 ################

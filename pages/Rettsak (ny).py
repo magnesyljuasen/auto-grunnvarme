@@ -10,45 +10,60 @@ def economic_comparison(df):
     with c1:
         st.write('Bergvarme')
         st.metric(label='LCOE (kr/kWh)', value=df['LCOE grunnvarme'][0])
-        st.metric(label='Totalkostnad (kr)', value=df['Totalkostnad grunnvarme'][0])
+        st.metric(label='Totalkostnad (kr)', value=f"{df['Totalkostnad grunnvarme'][0]:,}".replace(',', ' '))
+        st.metric(label='Total inntekt (kr)', value=f"{int(df['Verdi grunnvarme (diskontert)'].sum()):,}".replace(',', ' '))
+        st.metric(label='Nåverdi (kr)', value=f"{df['Nåverdi grunnvarme'][0]:,}".replace(',', ' '))
     with c2:
         st.write('Luft-vann')
         st.metric(label='LCOE (kr/kWh)', value=df['LCOE luft-vann'][0])
-        st.metric(label='Totalkostnad (kr)', value=df['Totalkostnad luft-vann'][0])
+        st.metric(label='Totalkostnad (kr)', value=f"{df['Totalkostnad luft-vann'][0]:,}".replace(',', ' '))
+        st.metric(label='Total inntekt (kr)', value=f"{int(df['Verdi luft-vann-VP (diskontert)'].sum()):,}".replace(',', ' '))
+        st.metric(label='Nåverdi (kr)', value=f"{df['Nåverdi luft-vann'][0]:,}".replace(',', ' '))
     with c3:
         st.write('Luft-luft')
         st.metric(label='LCOE (kr/kWh)', value=df['LCOE luft-luft'][0])
-        st.metric(label='Totalkostnad (kr)', value=df['Totalkostnad luft-luft'][0])
+        st.metric(label='Totalkostnad (kr)', value=f"{df['Totalkostnad luft-luft'][0]:,}".replace(',', ' '))
+        st.metric(label='Total inntekt (kr)', value=f"{int(df['Verdi luft-luft-VP (diskontert)'].sum()):,}".replace(',', ' '))
+        st.metric(label='Nåverdi (kr)', value=f"{df['Nåverdi luft-luft'][0]:,}".replace(',', ' '))
     with c4:
         st.write('Direkte elektrisk')
         st.metric(label='LCOE (kr/kWh)', value=df['LCOE_direkte_el'][0])
-        st.metric(label='Totalkostnad (kr)', value=df['Totalkostnad direkte elektrisk'][0])
+        st.metric(label='Totalkostnad (kr)', value=f"{df['Totalkostnad direkte elektrisk'][0]:,}".replace(',', ' '))
+        st.metric(label='Total inntekt (kr)', value=f"{int(df['Verdi direkte elektrisk (diskontert)'].sum()):,}".replace(',', ' '))
+        st.metric(label='Nåverdi (kr)', value=f"{df['Nåverdi direkte elektrisk'][0]:,}".replace(',', ' '))
 
-    compared_data = {
-        "luft-vann": df['Totalkostnad luft-vann'][0] - df['Totalkostnad grunnvarme'][0],
-        "luft-luft": df['Totalkostnad luft-luft'][0] - df['Totalkostnad grunnvarme'][0],
-        "direkte elektrisk": df['Totalkostnad direkte elektrisk'][0] - df['Totalkostnad grunnvarme'][0],
-    }
+    #compared_data = {
+    #    "luft-vann": df['Totalkostnad luft-vann'][0] - df['Totalkostnad grunnvarme'][0],
+    #    "luft-luft": df['Totalkostnad luft-luft'][0] - df['Totalkostnad grunnvarme'][0],
+    #    "direkte elektrisk": df['Totalkostnad direkte elektrisk'][0] - df['Totalkostnad grunnvarme'][0],
+    #}
 
-    min_string = min(compared_data, key=compared_data.get)
-    min_number = compared_data[min_string]
-    st.info(f"Bergvarme vs. {min_string}. **Mulig erstatning: {min_number} kr.**")
+    #min_string = min(compared_data, key=compared_data.get)
+    #min_number = compared_data[min_string]
+    #st.info(f"Bergvarme vs. {min_string}. **Mulig erstatning: {min_number} kr.**")
         
 
-def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENTE=4, YEARS=40):
+def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENTE=4, YEARS=40, COVERED_BY_ENOVA=0):
     produced_energy_list = np.zeros(YEARS)
     investment_geoenergy_list = np.zeros(YEARS)
     investment_air_water_list = np.zeros(YEARS)
     investment_air_air_list = np.zeros(YEARS)
+    investment_direct_list = np.zeros(YEARS)
 
     energy_cost_geoenergy_list = np.zeros(YEARS)
     energy_cost_air_water_list = np.zeros(YEARS)
     energy_cost_air_air_list = np.zeros(YEARS)
+    energy_cost_direct_list = np.zeros(YEARS)
 
-    cost_direct_el_list = np.zeros(YEARS) 
     cost_geoenergy_list = np.zeros(YEARS)
     cost_air_water_list = np.zeros(YEARS)
     cost_air_air_list = np.zeros(YEARS)
+    cost_direct_list = np.zeros(YEARS)
+
+    value_geoenergy_list = np.zeros(YEARS)
+    value_air_water_list = np.zeros(YEARS)
+    value_air_air_list = np.zeros(YEARS)
+    value_direct_list = np.zeros(YEARS) 
 
     diskonteringsrente_list = np.zeros(YEARS)
     year_list = np.zeros(YEARS)
@@ -59,25 +74,32 @@ def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENT
             energy_cost_geoenergy_list[i] = result_map['Kostnad grunnvarme'] * PERCENTAGE_INCREASE**i
             energy_cost_air_water_list[i] = result_map[f'Kostnad luft-vann-varmepumpe'] * PERCENTAGE_INCREASE**i
             energy_cost_air_air_list[i] = result_map[f'Kostnad luft-luft-varmepumpe'] * PERCENTAGE_INCREASE**i
-            cost_direct_el_list[i] = result_map['Kostnad direkte elektrisk'] * PERCENTAGE_INCREASE**i
+            energy_cost_direct_list[i] = result_map['Kostnad direkte elektrisk'] * PERCENTAGE_INCREASE**i
+
+            value_geoenergy_list[i] = result_map['Verdi grunnvarme'] * PERCENTAGE_INCREASE**i
+            value_air_water_list[i] = result_map['Verdi luft-vann-varmepumpe'] * PERCENTAGE_INCREASE**i
+            value_air_air_list[i] = result_map['Verdi luft-luft-varmepumpe'] * PERCENTAGE_INCREASE**i
+            value_direct_list[i] = result_map['Verdi direkte elektrisk'] * PERCENTAGE_INCREASE**i
 
         if i == 0:
-            investment_geoenergy_list[i] = result_map['Investering bergvarme-VP'] + result_map['Investering bergvarme brønner'] + result_map['Vannbåren varme']
+            investment_geoenergy_list[i] = (result_map['Investering bergvarme-VP'] + result_map['Investering bergvarme brønner'] + result_map['Vannbåren varme']) - COVERED_BY_ENOVA
             investment_air_water_list[i] = result_map[f'Investering luft-vann-VP'] + result_map['Vannbåren varme']
             investment_air_air_list[i] = result_map[f'Investering luft-luft-VP']
+            investment_direct_list[i] = result_map['Investering direkte elektrisk']
 
         if i == 15 or i == 30 or i == 45 or i == 60:
-            investment_air_water_list[i] = result_map[f'Investering luft-vann-VP']
+            investment_air_water_list[i] = result_map[f'Investering luft-vann-VP'] * 0.6
 
-        if i == 10 or i == 20 or i == 30 or i == 40 or i == 50 or i == 60:
+        if i == 12 or i == 24 or i == 36 or i == 48 or i == 60:
             investment_air_air_list[i] = result_map[f'Investering luft-luft-VP']
 
         if i == 20 or i == 40 or i == 60:
-            investment_geoenergy_list[i] = result_map['Investering bergvarme-VP']
+            investment_geoenergy_list[i] = result_map['Investering bergvarme-VP'] * 0.6
 
         cost_geoenergy_list = investment_geoenergy_list + energy_cost_geoenergy_list
         cost_air_water_list = investment_air_water_list + energy_cost_air_water_list
         cost_air_air_list = investment_air_air_list + energy_cost_air_air_list
+        cost_direct_list = investment_direct_list + energy_cost_direct_list
         
         if i >= 1:
             diskonteringsrente = 1 / (1 + (DISKONTERINGSRENTE/100))**i
@@ -88,18 +110,28 @@ def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENT
     cost_geoenergy_diskontert_list = cost_geoenergy_list * diskonteringsrente_list
     cost_air_water_diskontert_list = cost_air_water_list * diskonteringsrente_list    
     cost_air_air_diskontert_list = cost_air_air_list * diskonteringsrente_list
-    cost_direct_el_diskontert_list = cost_direct_el_list * diskonteringsrente_list
+    cost_direct_el_diskontert_list = cost_direct_list * diskonteringsrente_list
     produced_energy_diskontert_list = produced_energy_list * diskonteringsrente_list
+
+    value_geoenergy_diskontert_list = value_geoenergy_list * diskonteringsrente_list
+    value_air_water_diskontert_list = value_air_water_list * diskonteringsrente_list
+    value_air_air_diskontert_list = value_air_air_list * diskonteringsrente_list
+    value_direct_diskontert_list = value_direct_list * diskonteringsrente_list
 
     geoenergy_LCOE = round((cost_geoenergy_diskontert_list.sum()/produced_energy_diskontert_list.sum()),2)
     air_water_LCOE = round((cost_air_water_diskontert_list.sum()/produced_energy_diskontert_list.sum()),2)
     air_air_LCOE = round((cost_air_air_diskontert_list.sum()/produced_energy_diskontert_list.sum()),2)
     direct_el_LCOE = round((cost_direct_el_diskontert_list.sum()/produced_energy_diskontert_list.sum()),2)
-    
+
     geoenergy_total_cost = int(cost_geoenergy_diskontert_list.sum())
     air_water_total_cost = int(cost_air_water_diskontert_list.sum())
     air_air_total_cost = int(cost_air_air_diskontert_list.sum())
     direct_el_total_cost = int(cost_direct_el_diskontert_list.sum())
+
+    geoenergy_nnv = int(-(cost_geoenergy_diskontert_list.sum()) + value_geoenergy_diskontert_list.sum())
+    air_water_nnv = int(-(cost_air_water_diskontert_list.sum()) + value_air_water_diskontert_list.sum())
+    air_air_nnv = int(-(cost_air_air_diskontert_list.sum()) + value_air_air_diskontert_list.sum())
+    direct_nnv = int(-(cost_direct_el_diskontert_list.sum()) + value_direct_diskontert_list.sum())
 
     df = pd.DataFrame({
         'År' : year_list,
@@ -107,19 +139,24 @@ def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENT
         'Investering grunnvarme' : investment_geoenergy_list,
         'Investering luft-vann-VP' : investment_air_water_list,
         'Investering luft-luft-VP' : investment_air_air_list,
+        'Investering direkte elektrisk' : investment_direct_list,
         'Diskonteringsrente' : diskonteringsrente_list,
         'Energikostnad grunnvarme' : energy_cost_geoenergy_list,
         'Energikostnad luft-vann-VP' : energy_cost_air_water_list,
         'Energikostnad luft-luft-VP' : energy_cost_air_air_list,
-        'Energikostnad direkte elektrisk' : cost_direct_el_list,
+        'Energikostnad direkte elektrisk' : cost_direct_list,
         'Kostnad grunnvarme' : cost_geoenergy_list,
         'Kostnad luft-vann-VP' : cost_air_water_list,
         'Kostnad luft-luft-VP' : cost_air_air_list,
-        'Kostnad direkte elektrisk' : cost_direct_el_list,
+        'Kostnad direkte elektrisk' : cost_direct_list,
         'Kostnad grunnvarme (diskontert)' : cost_geoenergy_diskontert_list,
         'Kostnad luft-vann-VP (diskontert)' : cost_air_water_diskontert_list,
         'Kostnad luft-luft-VP (diskontert)' : cost_air_air_diskontert_list,
         'Kostnad direkte elektrisk (diskontert)' : cost_direct_el_diskontert_list,
+        'Verdi grunnvarme (diskontert)' : value_geoenergy_diskontert_list,
+        'Verdi luft-vann-VP (diskontert)' : value_air_water_diskontert_list,
+        'Verdi luft-luft-VP (diskontert)' : value_air_air_diskontert_list,
+        'Verdi direkte elektrisk (diskontert)' : value_direct_diskontert_list,
         'LCOE grunnvarme' : geoenergy_LCOE,
         'LCOE luft-vann' : air_water_LCOE,
         'LCOE luft-luft' : air_air_LCOE,
@@ -127,9 +164,17 @@ def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENT
         'Totalkostnad grunnvarme' : geoenergy_total_cost,
         'Totalkostnad luft-vann' : air_water_total_cost,
         'Totalkostnad luft-luft' : air_air_total_cost,
-        'Totalkostnad direkte elektrisk' : direct_el_total_cost
+        'Totalkostnad direkte elektrisk' : direct_el_total_cost,
+        'Nåverdi grunnvarme' : geoenergy_nnv,
+        'Nåverdi luft-vann' : air_water_nnv,
+        'Nåverdi luft-luft' : air_air_nnv,
+        'Nåverdi direkte elektrisk' : direct_nnv,
     })
     df = df.set_index('År')
+    st.line_chart(energy_cost_geoenergy_list[1:len(energy_cost_geoenergy_list)])
+    start_cost = energy_cost_geoenergy_list[1]
+    end_cost = energy_cost_geoenergy_list[len(energy_cost_geoenergy_list)-1]
+    st.write(f'Økning i driftskostnader (eksempel; bergvarme): {int(((end_cost-start_cost)/start_cost)*100)} %')
     return df
 
 def get_cooling_array():
@@ -153,7 +198,7 @@ def calculate_air_air(building_instance, energydemand_instance, outdoor_temperat
     POWER_REDUCTION = 20
     COP_REDUCTION = 20
     COVERAGE = 100
-    P_NOMINAL_REDUCED = st.number_input('Reduser varmepumpestørrelse', value=0.23, step=0.1, key='luft-luft')
+    P_NOMINAL_REDUCED = st.number_input('Reduser varmepumpestørrelse', value=0.41, step=0.1, key='luft-luft')
 
     heatpump_instance = HeatPump(building_instance)
     heatpump_instance.set_base_parameters(spaceheating_cop=SPACEHEATING_COP, spaceheating_coverage=SPACEHEATING_COVERAGE, dhw_cop=DHW_COP, dhw_coverage=DHW_COVERAGE)
@@ -195,7 +240,7 @@ def calculate_air_water(building_instance, energydemand_instance, outdoor_temper
 
 def calculate_geoenergy(building_instance, energydemand_instance, outdoor_temperature, building_standard, building_type, building_area):
     SPACEHEATING_COP = 3.5
-    SPACEHEATING_COVERAGE = 100
+    SPACEHEATING_COVERAGE = 99
     DHW_COP = 2.5
     DHW_COVERAGE = 100
     
@@ -216,11 +261,12 @@ def display_air_air_results(building_instance, air_air_instance):
 
     c1, c2 = st.columns(2)
     with c1:
-        st.metric('Varmepumpestørrelse (kW)', np.max(air_air_instance.heatpump_array))
+        st.metric('Varmepumpestørrelse (kW)', int(np.max(air_air_instance.heatpump_array)))
     with c2:
         st.metric('SCOP', round((np.sum(air_air_instance.heatpump_array)/np.sum(air_air_instance.compressor_array)),2))
     with c1:
-        st.metric('Energidekningsgrad (%)', round((np.sum(air_air_instance.heatpump_array)/np.sum(building_instance.dict_energy['dhw_array'] + building_instance.dict_energy['spaceheating_array']))*100))
+        st.metric('Energidekningsgrad totalt (%)', round((np.sum(air_air_instance.heatpump_array)/np.sum(building_instance.dict_energy['dhw_array'] + building_instance.dict_energy['spaceheating_array']))*100))
+        st.metric('Energidekningsgrad romoppvarming (%)', round((np.sum(air_air_instance.heatpump_array)/np.sum(building_instance.dict_energy['spaceheating_array']))*100))
 
     visualization_instance = Visualization()
     figure_air_air = visualization_instance.plot_hourly_series(
@@ -255,8 +301,8 @@ def display_air_air_results(building_instance, air_air_instance):
     with c1:
         st.plotly_chart(figure_cop_air_air, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
   
-    electric_array = air_water_instance.compressor_array + air_water_instance.peak_array
-    thermal_array = air_water_instance.from_air_array
+    electric_array = air_air_instance.compressor_array + air_air_instance.peak_array
+    thermal_array = air_air_instance.from_air_array
     return electric_array, thermal_array
 
 def display_electric_results(building_instance):
@@ -285,7 +331,7 @@ def display_air_water_results(building_instance, air_water_instance):
 
     c1, c2 = st.columns(2)
     with c1:
-        st.metric('Varmepumpestørrelse (kW)', np.max(air_water_instance.heatpump_array))
+        st.metric('Varmepumpestørrelse (kW)', int(np.max(air_water_instance.heatpump_array)))
     with c2:
         st.metric('SCOP', round((np.sum(air_water_instance.heatpump_array)/np.sum(air_water_instance.compressor_array)),2))
     with c1:
@@ -397,15 +443,31 @@ def display_geoenergy_results(building_instance, geoenergy_instance):
     thermal_array = geoenergy_instance.from_wells_array
     return electric_array, thermal_array
 
-def calculate_operation_costs(building_instance, SPOT_YEAR):
+def calculate_operation_costs_2(array, SPOT_YEAR, NETTLEIE = 'Variabel'):
     SPOT_REGION = 'NO1'
-    SPOT_EXTRA = 0.0
+    SPOT_EXTRA = 0.05
 
     operation_costs_instance = OperationCosts(building_instance)
     operation_costs_instance.set_spotprice_array(year=SPOT_YEAR, region=SPOT_REGION, surcharge=SPOT_EXTRA)
     operation_costs_instance.set_network_tariffs()
     operation_costs_instance.set_network_energy_component()
-    operation_costs_instance.get_operation_costs()
+
+    if NETTLEIE == 'Variabel':
+        cost_array = operation_costs_instance.calculate_operation_costs(array)
+    else:
+        cost_array = operation_costs_instance.calculate_operation_costs_fast_nettleie(array)
+
+    return cost_array
+
+def calculate_operation_costs(building_instance, SPOT_YEAR):
+    SPOT_REGION = 'NO1'
+    SPOT_EXTRA = 0.05
+
+    operation_costs_instance = OperationCosts(building_instance)
+    operation_costs_instance.set_spotprice_array(year=SPOT_YEAR, region=SPOT_REGION, surcharge=SPOT_EXTRA)
+    operation_costs_instance.set_network_tariffs()
+    operation_costs_instance.set_network_energy_component()
+    operation_costs_instance.get_operation_costs(nettleie=False)
 
     return operation_costs_instance.building_instance.dict_operation_costs
 
@@ -455,12 +517,15 @@ if __name__ == "__main__":
     st.info('3) Velge strømpris. Forslag (spotpris fra 2023 m/ nettleie også en økning som tilsvarer NVE sin 40% økning i strømpris mot 2051(?))')
     st.info('4) Andre betraktninger; hva velger vi av levetid og diskonteringsrente?')
 
+    
     BUILDING_STANDARD = 'Lite energieffektivt'
     BUILDING_TYPE = 'Hus'
     BUILDING_AREA = st.number_input(label = 'Areal (m2)', value=200, step=10)
     WATERBORNE_COST = 20000 + 815 * BUILDING_AREA
     WATERBORNE_COST = 566 * BUILDING_AREA
     WATERBORNE_HEATING_COST = st.number_input(label='Vannbåren varme (kr)', value=WATERBORNE_COST)
+    NETTLEIE_MODUS = st.selectbox('Nettleie', ['Variabel', 'Fast'])
+    ENOVA_STOTTE = st.checkbox(label='Med Enova-støtte?',value=True)
     c1, c2 = st.columns(2)
     with c1:
         SPOT_YEAR = st.number_input(label='Spotprisår', value=2023)
@@ -468,13 +533,16 @@ if __name__ == "__main__":
             FLAT_EL_PRICE = st.number_input(label='Flat strømpris?', value=0)
     with c2:
         DISKONTERINGSRENTE = st.number_input('Diskonteringsrente', value=4.0, step=0.1)
-        YEARS = st.number_input('Levetid', value=40, step=1)
-        PERCENTAGE_INCREASE = (st.number_input('Prosentvis økning i strømpris per år (%)', value = 1.5, min_value=0.0, max_value=10.0))/100 + 1
+        YEARS = st.number_input('Levetid', value=60, step=1)
+        PERCENTAGE_INCREASE = (st.number_input('Prosentvis økning i strømpris per år (%)', value = 0.6, min_value=0.0, max_value=10.0))/100 + 1
 
     with st.expander('Spotpris'):
         operation_costs_instance_plot = OperationCosts(Building())
-        operation_costs_instance_plot.set_spotprice_array(year=SPOT_YEAR, region='NO1', surcharge=0)
-
+        surcharge = 0.05
+        operation_costs_instance_plot.set_spotprice_array(year=SPOT_YEAR, region='NO1', surcharge=surcharge)
+        operation_costs_instance_plot.set_network_tariffs()
+        st.info(f'Påslag spotpris: {surcharge*100} øre/kWh')
+        
         figure_spotprice = Visualization().plot_hourly_series(
             operation_costs_instance_plot.spotprice_array,
             'Spotpris',
@@ -488,7 +556,8 @@ if __name__ == "__main__":
             colors=("#1d3c34", "#48a23f", "#FFC358")
         )
         st.plotly_chart(figure_spotprice, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
-
+        st.metric('Gjennomsnittlig spotpris (kr/kWh)', round(operation_costs_instance_plot.spotprice_array.mean(),2))
+        st.metric('Gjennomsnittlig strømpris (inkl. nettleie + påslag) (kr/kWh)', round(((operation_costs_instance_plot.spotprice_array + operation_costs_instance_plot.NETTLEIE).mean()),2))
 
 
     cooling_array = get_cooling_array()
@@ -516,8 +585,12 @@ if __name__ == "__main__":
             building_area=BUILDING_AREA
             )
         electric_array_geoenergy, thermal_array_geoenergy = display_geoenergy_results(building_instance_geoenergy, geoenergy_instance)
-        air_water_operation_costs = calculate_operation_costs(building_instance_geoenergy, SPOT_YEAR)
-        cost_array_geoenergy = air_water_operation_costs['geoenergy_consumption_array']
+        #geoenergy_operation_costs = calculate_operation_costs(building_instance_geoenergy, SPOT_YEAR)
+        #cost_array_geoenergy = geoenergy_operation_costs['geoenergy_consumption_array']
+        cost_array_geoenergy = calculate_operation_costs_2(array=electric_array_geoenergy, SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS)
+        value_array_geoenergy = calculate_operation_costs_2(array=(thermal_array_geoenergy+electric_array_geoenergy), SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS)
+        #st.metric(label='Beregnet strømpris (kr/kWh)', value=round(np.mean(np.sum(cost_array_geoenergy)/np.sum(electric_array_geoenergy)),2))
+        
         if FLAT_EL_PRICE > 0:
             cost_array_geoenergy = electric_array_geoenergy * FLAT_EL_PRICE
         display_operation_costs(cost_array_geoenergy)
@@ -532,8 +605,11 @@ if __name__ == "__main__":
             building_area=BUILDING_AREA
             )
         electric_array_air_water, thermal_array_air_water = display_air_water_results(building_instance_air_water, air_water_instance)
-        air_water_operation_costs = calculate_operation_costs(building_instance_air_water, SPOT_YEAR)
-        cost_array_air_water = air_water_operation_costs['heatpump_consumption_array']
+        #air_water_operation_costs = calculate_operation_costs(building_instance_air_water, SPOT_YEAR)
+        #cost_array_air_water = air_water_operation_costs['heatpump_consumption_array']
+        cost_array_air_water = calculate_operation_costs_2(array=electric_array_air_water, SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS)
+        value_array_air_water = calculate_operation_costs_2(array=(thermal_array_air_water+electric_array_air_water), SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS)
+        #st.metric(label='Beregnet strømpris (kr/kWh)', value=round(np.mean(np.sum(cost_array_air_water)/np.sum(electric_array_air_water)),2))
         if FLAT_EL_PRICE > 0:
             cost_array_air_water = electric_array_air_water * FLAT_EL_PRICE
         display_operation_costs(cost_array_air_water)
@@ -548,8 +624,11 @@ if __name__ == "__main__":
             building_area=BUILDING_AREA
             )
         electric_array_air_air, thermal_array_air_air = display_air_air_results(building_instance_air_air, air_air_instance)
-        air_air_operation_costs = calculate_operation_costs(building_instance_air_air, SPOT_YEAR)
-        cost_array_air_air = air_air_operation_costs['heatpump_consumption_array']
+        #air_air_operation_costs = calculate_operation_costs(building_instance_air_air, SPOT_YEAR)
+        #cost_array_air_air = air_air_operation_costs['heatpump_consumption_array']
+        cost_array_air_air = calculate_operation_costs_2(array=electric_array_air_air, SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS)
+        value_array_air_air = calculate_operation_costs_2(array=(thermal_array_air_air+electric_array_air_air), SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS)
+        #st.metric(label='Beregnet strømpris (kr/kWh)', value=round(np.mean(np.sum(cost_array_air_air)/np.sum(electric_array_air_air)),2))
         if FLAT_EL_PRICE > 0:
             cost_array_air_air = electric_array_air_air * FLAT_EL_PRICE
         display_operation_costs(cost_array_air_air)
@@ -564,17 +643,29 @@ if __name__ == "__main__":
             building_area=BUILDING_AREA
             )
         electric_direct, thermal_direct = display_electric_results(building_instance_direct)
-        direct_operation_costs = calculate_operation_costs(building_instance_direct, SPOT_YEAR)
-        cost_array_direct = direct_operation_costs['heating_array']
+        #direct_operation_costs = calculate_operation_costs(building_instance_direct, SPOT_YEAR)
+        #cost_array_direct = direct_operation_costs['heating_array']
+        cost_array_direct = calculate_operation_costs_2(array=electric_direct, SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS)
+        value_array_direct = calculate_operation_costs_2(array=(thermal_direct+electric_direct), SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS)
+        #st.metric(label='Beregnet strømpris (kr/kWh)', value=round(np.mean(np.sum(cost_array_direct)/np.sum(electric_direct)),2))
         if FLAT_EL_PRICE > 0:
             cost_array_direct = electric_direct * FLAT_EL_PRICE
         display_operation_costs(cost_array_direct)
 
     with st.expander('Økonomi', expanded=True):
+        COVERED_BY_ENOVA = 0
+        if (ENOVA_STOTTE == True) and (WATERBORNE_HEATING_COST > 0):
+            COVERED_BY_ENOVA = 40000
+        elif (ENOVA_STOTTE == True) and (WATERBORNE_HEATING_COST == 0):
+            COVERED_BY_ENOVA = 10000
+        elif (ENOVA_STOTTE == False):
+            COVERED_BY_ENOVA = 0
+
         result_map = {
             'Investering bergvarme-VP' : geoenergy_instance.investment_cost_heat_pump,
             'Investering luft-vann-VP' : (geoenergy_instance.investment_cost_heat_pump + geoenergy_instance.investment_cost_borehole) * 0.76,
             'Investering luft-luft-VP' : 30000,
+            'Investering direkte elektrisk' : 150*BUILDING_AREA,
             'Investering bergvarme brønner' : geoenergy_instance.investment_cost_borehole,
             'Strøm direkte elektrisk' : electric_direct.sum(),
             'Strøm luft-vann-varmepumpe' : electric_array_air_water.sum(),
@@ -584,9 +675,38 @@ if __name__ == "__main__":
             'Kostnad luft-vann-varmepumpe' : cost_array_air_water.sum(),
             'Kostnad luft-luft-varmepumpe' : cost_array_air_air.sum(),
             'Kostnad grunnvarme' : cost_array_geoenergy.sum(),
+            'Verdi direkte elektrisk' : value_array_direct.sum(),
+            'Verdi luft-vann-varmepumpe' : value_array_air_water.sum(),
+            'Verdi luft-luft-varmepumpe' : value_array_geoenergy.sum(), # NBNB
+            'Verdi grunnvarme' : value_array_geoenergy.sum(),
             'Vannbåren varme' : WATERBORNE_HEATING_COST
         }
-        df_final = economic_calculation(result_map=result_map, DISKONTERINGSRENTE=DISKONTERINGSRENTE, YEARS=YEARS, PERCENTAGE_INCREASE=PERCENTAGE_INCREASE)
+        st.write(result_map)
+        df_final = economic_calculation(result_map=result_map, DISKONTERINGSRENTE=DISKONTERINGSRENTE, YEARS=YEARS, PERCENTAGE_INCREASE=PERCENTAGE_INCREASE, COVERED_BY_ENOVA = COVERED_BY_ENOVA)
         st.write(df_final)
         economic_comparison(df_final)
+        
+        df_to_excel = pd.DataFrame({
+            'Oppvarmingsbehov' : [int(df_final['Produsert energi'][2])],
+            'Strømforbruk, bergvarme (kWh/år)' : [result_map['Strøm grunnvarme']],
+            'Strømforbuk, luft-vann (kWh/år)' : [result_map['Strøm luft-vann-varmepumpe']],
+            'Strømforbruk, luft-luft (kWh/år)' : [result_map['Strøm luft-luft-varmepumpe']],
+            'Strømforbruk, direkte elektrisk (kWh/år)' : [result_map['Strøm direkte elektrisk']],
+            'Investeringskostnad, bergvarme (kr)' : [int(df_final['Investering grunnvarme'][0]-WATERBORNE_HEATING_COST)],
+            'Investeringskostnad, luft-vann (kr)' : [int(df_final['Investering luft-vann-VP'][0]-WATERBORNE_HEATING_COST)],
+            'Investeringskostnad, luft-luft (kr)' : [int(df_final['Investering luft-luft-VP'][0])],
+            'Investeringskostnad, direkte elektrisk (kr)' : [int(df_final['Investering direkte elektrisk'][0])],
+            'Investeringskostnad, vannbåren varme (kr)' : [int(WATERBORNE_HEATING_COST)],
+            'Nåverdi, bergvarme (kr)' : [int(df_final['Nåverdi grunnvarme'][0])],
+            'Nåverdi, luft-vann (kr)' : [int(df_final['Nåverdi luft-vann'][0])],
+            'Nåverdi, luft-luft (kr)' : [int(df_final['Nåverdi luft-luft'][0])],
+            'Nåverdi, direkte elektrisk (kr)' : [int(df_final['Nåverdi direkte elektrisk'][0])]
+        })
+        df_to_excel = df_to_excel.astype(int)
+        st.write(df_to_excel)
 
+
+# 10000 for væske vann
+# 10000 for vannbåren varme
+# 5000 for akkumulatortank
+# 15000 for alt 
