@@ -169,7 +169,7 @@ def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENT
         })
         st.bar_chart(df_costs_air_water)
         df_direct_electric = pd.DataFrame({
-            'Kostnader, direkte elektrisk' : -cost_air_water_diskontert_list,
+            'Kostnader, direkte elektrisk' : -cost_direct_el_diskontert_list,
             'Inntekter, direkte elektrisk' : cost_direct_el_diskontert_list
         })
         st.bar_chart(df_direct_electric)
