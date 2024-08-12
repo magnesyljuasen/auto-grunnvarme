@@ -521,6 +521,7 @@ class OperationCosts:
         self.network_energy_array = network_energy_array
     
     def _network_capacity_component(self, demand_array):
+        MULTIPLIER = 1
         previous_index = 0
         daymax = 0
         daymax_list = []
@@ -538,23 +539,23 @@ class OperationCosts:
                 if 0 < average_max_value <= 2:
                     cost = 120
                 elif 2 < average_max_value <= 5:
-                    cost = 190
+                    cost = 190 * MULTIPLIER
                 elif 5 < average_max_value <= 10:
-                    cost = 305
+                    cost = 305 * MULTIPLIER
                 elif 10 < average_max_value <= 15:
-                    cost = 420
+                    cost = 420 * MULTIPLIER
                 elif 15 < average_max_value <= 20:
-                    cost = 535
+                    cost = 535 * MULTIPLIER
                 elif 20 < average_max_value <= 25:
-                    cost = 650
+                    cost = 650 * MULTIPLIER
                 elif 25 < average_max_value <= 50:
-                    cost = 1225
+                    cost = 1225 * MULTIPLIER
                 elif 50 < average_max_value <= 75:
-                    cost = 1800 
+                    cost = 1800 * MULTIPLIER
                 elif 75 < average_max_value <= 100:
-                    cost = 2375 
+                    cost = 2375 * MULTIPLIER
                 elif average_max_value > 100:
-                    cost = 4750 
+                    cost = 4750 * MULTIPLIER
                 else:
                     cost = 0
                 cost_per_hour = cost/(index-previous_index)
@@ -569,7 +570,7 @@ class OperationCosts:
     def calculate_operation_costs(self, array):
         st.markdown('---')
         spotcosts_array = self.spotprice_array * array # spotpris
-        st.write(f'Spotpris: {int(np.sum(spotcosts_array))} kr | {round(np.sum(spotcosts_array)/np.sum(array),2)} kr/kWh')
+        st.write(f'Spotkostnader: {int(np.sum(spotcosts_array))} kr | {round(np.sum(spotcosts_array)/np.sum(array),2)} kr/kWh')
         network_energycosts_array = self.network_energy_array * array # energiledd
         st.write(f'Energiledd: {int(np.sum(network_energycosts_array))} kr | {round(np.sum(network_energycosts_array)/np.sum(array),2)} kr/kWh')
         network_capacitycosts_array = self._network_capacity_component(array) # kapasitetsledd
