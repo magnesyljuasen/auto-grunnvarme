@@ -86,7 +86,7 @@ def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENT
                 investment_geoenergy_list[i] = 0
             else:
                 investment_geoenergy_list[i] = (result_map['Investering bergvarme-VP'] + result_map['Investering bergvarme brønner'] + result_map['Vannbåren varme']) - COVERED_BY_ENOVA
-            investment_air_water_list[i] = result_map[f'Investering luft-vann-VP'] + result_map['Vannbåren varme']
+            investment_air_water_list[i] = result_map[f'Investering luft-vann-VP'] + result_map['Vannbåren varme'] - COVERED_BY_ENOVA
             investment_air_air_list[i] = result_map[f'Investering luft-luft-VP'] + result_map['Kostnad direkte elektrisk']*0.5
             investment_direct_list[i] = result_map['Investering direkte elektrisk']
 
@@ -713,8 +713,8 @@ if __name__ == "__main__":
             COVERED_BY_ENOVA = 0
             if (ENOVA_STOTTE == True) and (WATERBORNE_HEATING_COST > 0):
                 COVERED_BY_ENOVA = 40000
-            elif (ENOVA_STOTTE == True) and (WATERBORNE_HEATING_COST == 0):
-                COVERED_BY_ENOVA = 10000
+            elif ENOVA_STOTTE == True:
+                COVERED_BY_ENOVA = 15000
             elif (ENOVA_STOTTE == False):
                 COVERED_BY_ENOVA = 0
 
