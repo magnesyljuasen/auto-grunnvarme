@@ -86,8 +86,12 @@ def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENT
                 investment_geoenergy_list[i] = 0
             else:
                 investment_geoenergy_list[i] = (result_map['Investering bergvarme-VP'] + result_map['Investering bergvarme brønner'] + result_map['Vannbåren varme']) - COVERED_BY_ENOVA
-            investment_air_water_list[i] = result_map[f'Investering luft-vann-VP'] + result_map['Vannbåren varme'] - COVERED_BY_ENOVA
-            investment_air_air_list[i] = result_map[f'Investering luft-luft-VP'] + result_map['Kostnad direkte elektrisk']*0.5
+            if COVERED_BY_ENOVA == 15000 or COVERED_BY_ENOVA == 40000:
+                air_water_stotte = 15000
+            else:
+                air_water_stotte = 0
+            investment_air_water_list[i] = result_map[f'Investering luft-vann-VP'] + result_map['Vannbåren varme'] - air_water_stotte
+            investment_air_air_list[i] = result_map[f'Investering luft-luft-VP'] + result_map['Kostnad direkte elektrisk']*0.4
             investment_direct_list[i] = result_map['Investering direkte elektrisk']
 
         if i == 15 or i == 30 or i == 45 or i == 60:
@@ -141,11 +145,34 @@ def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENT
     air_air_total_cost = int(cost_air_air_diskontert_list.sum())
     direct_el_total_cost = int(cost_direct_el_diskontert_list.sum())
 
-    geoenergy_nnv = int(-(cost_geoenergy_diskontert_list.sum()) + value_geoenergy_diskontert_list.sum())
-    air_water_nnv = int(-(cost_air_water_diskontert_list.sum()) + value_air_water_diskontert_list.sum())
-    air_air_nnv = int(-(cost_air_air_diskontert_list.sum()) + value_air_air_diskontert_list.sum())
-    direct_nnv = int(-(cost_direct_el_diskontert_list.sum()) + value_direct_diskontert_list.sum())
+    geoenergy_nnv = int(-(cost_geoenergy_diskontert_list.sum()) + cost_direct_el_diskontert_list.sum())
+    air_water_nnv = int(-(cost_air_water_diskontert_list.sum()) + cost_direct_el_diskontert_list.sum())
+    air_air_nnv = int(-(cost_air_air_diskontert_list.sum()) + cost_direct_el_diskontert_list.sum())
+    direct_nnv = int(-(cost_direct_el_diskontert_list.sum()) + cost_direct_el_diskontert_list.sum())
 
+    c1, c2 = st.columns(2)
+    with c1:
+        df_costs_geoenergy = pd.DataFrame({
+            'Kostnader, grunnvarme' : -cost_geoenergy_diskontert_list,
+            'Inntekter, grunnvarme' : cost_direct_el_diskontert_list
+        })
+        st.bar_chart(df_costs_geoenergy)
+        df_costs_air_air = pd.DataFrame({
+            'Kostnader, luft-luft' : -cost_air_air_diskontert_list,
+            'Inntekter, luft-luft' : cost_direct_el_diskontert_list
+        })
+        st.bar_chart(df_costs_air_air)
+    with c2:
+        df_costs_air_water = pd.DataFrame({
+            'Kostnader, luft-vann' : -cost_air_water_diskontert_list,
+            'Inntekter, luft-vann' : cost_direct_el_diskontert_list
+        })
+        st.bar_chart(df_costs_air_water)
+        df_direct_electric = pd.DataFrame({
+            'Kostnader, direkte elektrisk' : -cost_air_water_diskontert_list,
+            'Inntekter, direkte elektrisk' : cost_direct_el_diskontert_list
+        })
+        st.bar_chart(df_direct_electric)
     df = pd.DataFrame({
         'År' : year_list,
         'Produsert energi' : produced_energy_list,
@@ -192,7 +219,7 @@ def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENT
     st.write(f'**Gjennomsnittlig strømpris, start (eksempel; bergvarme): {round(start_cost/np.sum(electric_array_geoenergy),2)} kr/kWh**')
     st.write(f'**Gjennomsnittlig strømpris, slutt (eksempel; bergvarme): {round(end_cost/np.sum(electric_array_geoenergy),2)} kr/kWh**')
     
-    return df
+    return df, air_water_stotte
 
 def get_cooling_array():
     cooling_array = pd.read_excel('src/testdata/cooling_sheet.xlsx')['Hus_Oslo'].to_numpy()
@@ -713,33 +740,33 @@ if __name__ == "__main__":
             COVERED_BY_ENOVA = 0
             if (ENOVA_STOTTE == True) and (WATERBORNE_HEATING_COST > 0):
                 COVERED_BY_ENOVA = 40000
-            elif ENOVA_STOTTE == True:
+            elif (ENOVA_STOTTE == True) and (WATERBORNE_HEATING_COST == 0):
                 COVERED_BY_ENOVA = 15000
             elif (ENOVA_STOTTE == False):
                 COVERED_BY_ENOVA = 0
 
             result_map = {
-                'Investering bergvarme-VP' : geoenergy_instance.investment_cost_heat_pump,
-                'Investering luft-vann-VP' : (geoenergy_instance.investment_cost_heat_pump + geoenergy_instance.investment_cost_borehole) * 0.76,
-                'Investering luft-luft-VP' : 30000,
-                'Investering direkte elektrisk' : 150*BUILDING_AREA,
-                'Investering bergvarme brønner' : geoenergy_instance.investment_cost_borehole,
-                'Strøm direkte elektrisk' : electric_direct.sum(),
-                'Strøm luft-vann-varmepumpe' : electric_array_air_water.sum(),
-                'Strøm luft-luft-varmepumpe' : electric_array_air_air.sum(),
-                'Strøm grunnvarme' : electric_array_geoenergy.sum(),
-                'Kostnad direkte elektrisk' : cost_array_direct.sum(),
-                'Kostnad luft-vann-varmepumpe' : cost_array_air_water.sum(),
-                'Kostnad luft-luft-varmepumpe' : cost_array_air_air.sum(),
-                'Kostnad grunnvarme' : cost_array_geoenergy.sum(),
-                'Verdi direkte elektrisk' : value_array_direct.sum(),
-                'Verdi luft-vann-varmepumpe' : value_array_air_water.sum(),
-                'Verdi luft-luft-varmepumpe' : value_array_geoenergy.sum(), # NBNB
-                'Verdi grunnvarme' : value_array_geoenergy.sum(),
-                'Vannbåren varme' : WATERBORNE_HEATING_COST
+                'Investering bergvarme-VP' : int(geoenergy_instance.investment_cost_heat_pump),
+                'Investering luft-vann-VP' : int((geoenergy_instance.investment_cost_heat_pump + geoenergy_instance.investment_cost_borehole) * 0.76),
+                'Investering luft-luft-VP' : int(30000),
+                'Investering direkte elektrisk' : int(150*BUILDING_AREA),
+                'Investering bergvarme brønner' : int(geoenergy_instance.investment_cost_borehole),
+                'Strøm direkte elektrisk' : int(electric_direct.sum()),
+                'Strøm luft-vann-varmepumpe' : int(electric_array_air_water.sum()),
+                'Strøm luft-luft-varmepumpe' : int(electric_array_air_air.sum()),
+                'Strøm grunnvarme' : int(electric_array_geoenergy.sum()),
+                'Kostnad direkte elektrisk' : int(cost_array_direct.sum()),
+                'Kostnad luft-vann-varmepumpe' : int(cost_array_air_water.sum()),
+                'Kostnad luft-luft-varmepumpe' : int(cost_array_air_air.sum()),
+                'Kostnad grunnvarme' : int(cost_array_geoenergy.sum()),
+                'Verdi direkte elektrisk' : int(value_array_direct.sum()),
+                'Verdi luft-vann-varmepumpe' : int(value_array_air_water.sum()),
+                'Verdi luft-luft-varmepumpe' : int(value_array_geoenergy.sum()), # NBNB
+                'Verdi grunnvarme' : int(value_array_geoenergy.sum()),
+                'Vannbåren varme' : int(WATERBORNE_HEATING_COST)
             }
             st.write(result_map)
-            df_final = economic_calculation(result_map=result_map, DISKONTERINGSRENTE=DISKONTERINGSRENTE, YEARS=YEARS, PERCENTAGE_INCREASE=PERCENTAGE_INCREASE, COVERED_BY_ENOVA = COVERED_BY_ENOVA)
+            df_final, air_water_stotte = economic_calculation(result_map=result_map, DISKONTERINGSRENTE=DISKONTERINGSRENTE, YEARS=YEARS, PERCENTAGE_INCREASE=PERCENTAGE_INCREASE, COVERED_BY_ENOVA = COVERED_BY_ENOVA)
             st.write(df_final)
             economic_comparison(df_final)
             
@@ -753,8 +780,8 @@ if __name__ == "__main__":
                 'Driftskostnad, luft-vann (kr/år)' : [int(result_map['Kostnad luft-vann-varmepumpe'])],
                 'Driftskostnad, luft-luft (kr/år)' : [int(result_map['Kostnad luft-luft-varmepumpe'])],
                 'Driftskostnad, direkte elektrisk (kr/år)' : [int(result_map['Kostnad direkte elektrisk'])],
-                'Investeringskostnad, bergvarme (kr)' : [int(df_final['Investering grunnvarme'][0]-WATERBORNE_HEATING_COST)],
-                'Investeringskostnad, luft-vann (kr)' : [int(df_final['Investering luft-vann-VP'][0]-WATERBORNE_HEATING_COST)],
+                'Investeringskostnad, bergvarme (kr)' : [int(df_final['Investering grunnvarme'][0]-WATERBORNE_HEATING_COST-COVERED_BY_ENOVA)],
+                'Investeringskostnad, luft-vann (kr)' : [int(df_final['Investering luft-vann-VP'][0]-WATERBORNE_HEATING_COST-air_water_stotte)],
                 'Investeringskostnad, luft-luft (kr)' : [int(df_final['Investering luft-luft-VP'][0])],
                 'Investeringskostnad, direkte elektrisk (kr)' : [int(df_final['Investering direkte elektrisk'][0])],
                 'Investeringskostnad, vannbåren varme (kr)' : [int(WATERBORNE_HEATING_COST)],
