@@ -175,6 +175,10 @@ def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENT
     start_cost = energy_cost_geoenergy_list[1]
     end_cost = energy_cost_geoenergy_list[len(energy_cost_geoenergy_list)-1]
     st.write(f'Økning i driftskostnader (eksempel; bergvarme): {int(((end_cost-start_cost)/start_cost)*100)} %')
+
+    st.write(f'**Gjennomsnittlig strømpris, start (eksempel; bergvarme): {round(start_cost/np.sum(electric_array_geoenergy),2)} kr/kWh**')
+    st.write(f'**Gjennomsnittlig strømpris, slutt (eksempel; bergvarme): {round(end_cost/np.sum(electric_array_geoenergy),2)} kr/kWh**')
+    
     return df
 
 def get_cooling_array():
@@ -459,10 +463,9 @@ def calculate_operation_costs_2(array, SPOT_YEAR, NETTLEIE = 'Variabel'):
 
     return cost_array
 
-def calculate_operation_costs(building_instance, SPOT_YEAR):
+def calculate_operation_costs(building_instance, SPOT_YEAR, TYPE='Kostnad'):
     SPOT_REGION = 'NO1'
     SPOT_EXTRA = 0.05
-
     operation_costs_instance = OperationCosts(building_instance)
     operation_costs_instance.set_spotprice_array(year=SPOT_YEAR, region=SPOT_REGION, surcharge=SPOT_EXTRA)
     operation_costs_instance.set_network_tariffs()
@@ -490,7 +493,7 @@ def display_operation_costs(array, ymax=50):
     with c1:
         st.metric('Kostnad for strøm (kr)', int(np.sum(array)))
 
-def display_energy_effect(building_instance):
+def display_energy_effect(building_instance, cooling_array):
     visualization_instance = Visualization()
     figure_demands = visualization_instance.plot_hourly_series(
         building_instance.dict_energy['dhw_array'],
@@ -499,10 +502,12 @@ def display_energy_effect(building_instance):
         'Romoppvarmingsbehov',
         building_instance.dict_energy['electric_array'],
         'Elspesifikt behov',
+        cooling_array,
+        'Kjølebehov',
         height=400,
         ylabel='Effekt (kW)',
         yticksuffix=None,
-        colors=("#367061", "#8ec9b9", "#C98E9E")
+        colors=("#367061", "#8ec9b9", "#C98E9E", "#8ebcc9")
     )
     st.plotly_chart(figure_demands, use_container_width=True, config = {'displayModeBar': False, 'staticPlot': False})
     st.metric('Totalt (kWh)', int(np.sum(building_instance.dict_energy['dhw_array'] + building_instance.dict_energy['spaceheating_array'] + building_instance.dict_energy['electric_array'])))
@@ -561,6 +566,7 @@ if __name__ == "__main__":
 
 
     cooling_array = get_cooling_array()
+    cooling_array = cooling_array * BUILDING_AREA
     outdoor_temperature = get_outdoor_temperature()
     
     with st.expander('Energibehov'):
@@ -573,7 +579,7 @@ if __name__ == "__main__":
         energydemand_instance = EnergyDemand(building_instance)
         energydemand_instance.profet_calculation()
         energydemand_instance.calcluate_flow_temperature()
-        display_energy_effect(building_instance=building_instance)
+        display_energy_effect(building_instance=building_instance, cooling_array=cooling_array)
 
     with st.expander('Bergvarme'):
         building_instance_geoenergy, geoenergy_instance = calculate_geoenergy(
@@ -700,7 +706,7 @@ if __name__ == "__main__":
             'Nåverdi, bergvarme (kr)' : [int(df_final['Nåverdi grunnvarme'][0])],
             'Nåverdi, luft-vann (kr)' : [int(df_final['Nåverdi luft-vann'][0])],
             'Nåverdi, luft-luft (kr)' : [int(df_final['Nåverdi luft-luft'][0])],
-            'Nåverdi, direkte elektrisk (kr)' : [int(df_final['Nåverdi direkte elektrisk'][0])]
+            'Nåverdi, direkte elektrisk (kr)' : [int(df_final['Nåverdi direkte elektrisk'][0])],
         })
         df_to_excel = df_to_excel.astype(int)
         st.write(df_to_excel)
