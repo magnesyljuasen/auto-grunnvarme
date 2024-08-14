@@ -69,7 +69,19 @@ def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENT
     year_list = np.zeros(YEARS)
     for i in range(0, YEARS):
         year_list[i] = i
-        if i != 0:
+        if i == 1:
+            produced_energy_list[i] = result_map['Strøm direkte elektrisk']
+            energy_cost_geoenergy_list[i] = result_map['Kostnad grunnvarme (strømstøtte)'] * PERCENTAGE_INCREASE**i
+            energy_cost_air_water_list[i] = result_map[f'Kostnad luft-vann-varmepumpe (strømstøtte)'] * PERCENTAGE_INCREASE**i
+            energy_cost_air_air_list[i] = result_map[f'Kostnad luft-luft-varmepumpe (strømstøtte)'] * PERCENTAGE_INCREASE**i
+            energy_cost_direct_list[i] = result_map['Kostnad direkte elektrisk (strømstøtte)'] * PERCENTAGE_INCREASE**i
+
+            value_geoenergy_list[i] = result_map['Verdi grunnvarme'] * PERCENTAGE_INCREASE**i
+            value_air_water_list[i] = result_map['Verdi luft-vann-varmepumpe'] * PERCENTAGE_INCREASE**i
+            value_air_air_list[i] = result_map['Verdi luft-luft-varmepumpe'] * PERCENTAGE_INCREASE**i
+            value_direct_list[i] = result_map['Verdi direkte elektrisk'] * PERCENTAGE_INCREASE**i
+
+        if i != 0 and i != 1:
             produced_energy_list[i] = result_map['Strøm direkte elektrisk']
             energy_cost_geoenergy_list[i] = result_map['Kostnad grunnvarme'] * PERCENTAGE_INCREASE**i
             energy_cost_air_water_list[i] = result_map[f'Kostnad luft-vann-varmepumpe'] * PERCENTAGE_INCREASE**i
@@ -672,6 +684,7 @@ if __name__ == "__main__":
             #geoenergy_operation_costs = calculate_operation_costs(building_instance_geoenergy, SPOT_YEAR)
             #cost_array_geoenergy = geoenergy_operation_costs['geoenergy_consumption_array']
             cost_array_geoenergy = calculate_operation_costs_2(array=electric_array_geoenergy, SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS, with_stromstotte=WITH_STROMSTOTTE)
+            cost_array_geoenergy_STROMSTOTTE = calculate_operation_costs_2(array=electric_array_geoenergy, SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS, with_stromstotte=True)
             value_array_geoenergy = calculate_operation_costs_2(array=(thermal_array_geoenergy+electric_array_geoenergy), SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS, with_stromstotte=WITH_STROMSTOTTE)
             #st.metric(label='Beregnet strømpris (kr/kWh)', value=round(np.mean(np.sum(cost_array_geoenergy)/np.sum(electric_array_geoenergy)),2))
             
@@ -692,6 +705,7 @@ if __name__ == "__main__":
             #air_water_operation_costs = calculate_operation_costs(building_instance_air_water, SPOT_YEAR)
             #cost_array_air_water = air_water_operation_costs['heatpump_consumption_array']
             cost_array_air_water = calculate_operation_costs_2(array=electric_array_air_water, SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS, with_stromstotte=WITH_STROMSTOTTE)
+            cost_array_air_water_STROMSTOTTE = calculate_operation_costs_2(array=electric_array_air_water, SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS, with_stromstotte=True)
             value_array_air_water = calculate_operation_costs_2(array=(thermal_array_air_water+electric_array_air_water), SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS, with_stromstotte=WITH_STROMSTOTTE)
             #st.metric(label='Beregnet strømpris (kr/kWh)', value=round(np.mean(np.sum(cost_array_air_water)/np.sum(electric_array_air_water)),2))
             if FLAT_EL_PRICE > 0:
@@ -711,6 +725,7 @@ if __name__ == "__main__":
             #air_air_operation_costs = calculate_operation_costs(building_instance_air_air, SPOT_YEAR)
             #cost_array_air_air = air_air_operation_costs['heatpump_consumption_array']
             cost_array_air_air = calculate_operation_costs_2(array=electric_array_air_air, SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS, with_stromstotte=WITH_STROMSTOTTE)
+            cost_array_air_air_STROMSTOTTE = calculate_operation_costs_2(array=electric_array_air_air, SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS, with_stromstotte=True)
             value_array_air_air = calculate_operation_costs_2(array=(thermal_array_air_air+electric_array_air_air), SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS, with_stromstotte=WITH_STROMSTOTTE)
             #st.metric(label='Beregnet strømpris (kr/kWh)', value=round(np.mean(np.sum(cost_array_air_air)/np.sum(electric_array_air_air)),2))
             if FLAT_EL_PRICE > 0:
@@ -730,6 +745,7 @@ if __name__ == "__main__":
             #direct_operation_costs = calculate_operation_costs(building_instance_direct, SPOT_YEAR)
             #cost_array_direct = direct_operation_costs['heating_array']
             cost_array_direct = calculate_operation_costs_2(array=electric_direct, SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS, with_stromstotte=WITH_STROMSTOTTE)
+            cost_array_direct_STROMSTOTTE = calculate_operation_costs_2(array=electric_direct, SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS, with_stromstotte=True)
             value_array_direct = calculate_operation_costs_2(array=(thermal_direct+electric_direct), SPOT_YEAR=SPOT_YEAR, NETTLEIE=NETTLEIE_MODUS, with_stromstotte=WITH_STROMSTOTTE)
             #st.metric(label='Beregnet strømpris (kr/kWh)', value=round(np.mean(np.sum(cost_array_direct)/np.sum(electric_direct)),2))
             if FLAT_EL_PRICE > 0:
@@ -759,6 +775,10 @@ if __name__ == "__main__":
                 'Kostnad luft-vann-varmepumpe' : int(cost_array_air_water.sum()),
                 'Kostnad luft-luft-varmepumpe' : int(cost_array_air_air.sum()),
                 'Kostnad grunnvarme' : int(cost_array_geoenergy.sum()),
+                'Kostnad direkte elektrisk (strømstøtte)' : int(cost_array_direct_STROMSTOTTE.sum()),
+                'Kostnad luft-vann-varmepumpe (strømstøtte)' : int(cost_array_air_water_STROMSTOTTE.sum()),
+                'Kostnad luft-luft-varmepumpe (strømstøtte)' : int(cost_array_air_air_STROMSTOTTE.sum()),
+                'Kostnad grunnvarme (strømstøtte)' : int(cost_array_geoenergy_STROMSTOTTE.sum()),
                 'Verdi direkte elektrisk' : int(value_array_direct.sum()),
                 'Verdi luft-vann-varmepumpe' : int(value_array_air_water.sum()),
                 'Verdi luft-luft-varmepumpe' : int(value_array_geoenergy.sum()), # NBNB
