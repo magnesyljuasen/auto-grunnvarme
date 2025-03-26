@@ -1,4 +1,5 @@
 import streamlit as st
+
 st.header("Tanke")
 st.write("""Ideen er å lage et python-bibliotek for grunnvarme som samler 
          alle relevante beregninger og muliggjør kombinering av disse i ulike sammensetninger.

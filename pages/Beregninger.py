@@ -602,32 +602,44 @@ def display_energy_effect(building_instance, cooling_array):
 
 
 if __name__ == "__main__":
-    st.title('Beregninger til rettsak')
-    st.info('1) Tilpasse energibehov. Til målte data om det finnes | Hvis ikke; bruke areal og bygningsår.')
-    st.info('2) Velge dekningsgrader. Forslag (bergvarme = 100%, luft-vann = 85 %, luft-luft = 35%)')
-    st.info('3) Velge strømpris. Forslag (spotpris fra 2023 m/ nettleie også en økning som tilsvarer NVE sin 40% økning i strømpris mot 2051(?))')
-    st.info('4) Andre betraktninger; hva velger vi av levetid og diskonteringsrente?')
+    st.title('Demo av beregninger for ulike energiforsyningsløsninger')
+    with st.expander('Videreutvikling'):
+        st.info('1) Tilpasse energibehov. Til målte data om det finnes | Hvis ikke; bruke areal og bygningsår.')
+        st.info('2) Velge dekningsgrader. Forslag (bergvarme = 100%, luft-vann = 85 %, luft-luft = 35%)')
+        st.info('3) Velge strømpris. Forslag (spotpris fra 2023 m/ nettleie også en økning som tilsvarer NVE sin 40% økning i strømpris mot 2051(?))')
+        st.info('4) Andre betraktninger; hva velger vi av levetid og diskonteringsrente?')
 
     
-    BUILDING_STANDARD = st.selectbox('Standard', ['Lite energieffektivt', 'Middels energieffektivt'])
-    BUILDING_TYPE = 'Hus'
-    BUILDING_AREA = st.number_input(label = 'Areal (m2)', value=200, step=10)
-    WATERBORNE_COST = 20000 + 815 * BUILDING_AREA
-    WATERBORNE_COST = 566 * BUILDING_AREA
-    WATERBORNE_HEATING_COST = st.number_input(label='Vannbåren varme (kr)', value=WATERBORNE_COST)
-    NETTLEIE_MODUS = st.selectbox('Nettleie', ['Variabel', 'Fast'])
-    ENOVA_STOTTE = st.checkbox(label='Med Enova-støtte?',value=True)
-    WITHOUT_WELL = st.checkbox('Fjern investeringskostnad for bergvarme?', value=False)
-    WITH_STROMSTOTTE = st.checkbox('Med strømstøtte?', value=False)
+    c1, c2 = st.columns(2)
+    with c1:
+        BUILDING_STANDARD = st.selectbox('Bygningsstandard', ['Lite energieffektivt', 'Middels energieffektivt'])
+    with c2:
+        BUILDING_TYPE = 'Hus'
+        BUILDING_AREA = st.number_input(label = 'Areal (m2)', value=200, step=10)
+    with c1:    
+        WATERBORNE_COST = 20000 + 815 * BUILDING_AREA
+        WATERBORNE_COST = 566 * BUILDING_AREA
+        WATERBORNE_HEATING_COST = st.number_input(label='Vannbåren varme (kr)', value=WATERBORNE_COST)
+    with c2:
+        NETTLEIE_MODUS = st.selectbox('Nettleie', ['Variabel', 'Fast'])
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        ENOVA_STOTTE = st.checkbox(label='Med Enova-støtte?',value=True)
+    with c2:
+        WITHOUT_WELL = st.checkbox('Fjern investeringskostnad for bergvarme?', value=False)
+    with c3:
+        WITH_STROMSTOTTE = st.checkbox('Med strømstøtte?', value=False)
+    
     c1, c2 = st.columns(2)
     with c1:
         SPOT_YEAR = st.number_input(label='Spotprisår', value=2023)
-        with st.expander('Flat strømpris'):
-            FLAT_EL_PRICE = st.number_input(label='Flat strømpris?', value=0)
-    with c2:
         DISKONTERINGSRENTE = st.number_input('Diskonteringsrente', value=4.0, step=0.1)
+    with c2:
         YEARS = st.number_input('Levetid', value=60, step=1)
         PERCENTAGE_INCREASE = (st.number_input('Prosentvis økning i strømpris per år (%)', value = 0.0, min_value=0.0, max_value=10.0))/100 + 1
+
+    with st.expander('Flat strømpris?'):
+        FLAT_EL_PRICE = st.number_input(label='Flat strømpris?', value=0)
 
     with st.expander('Spotpris'):
         operation_costs_instance_plot = OperationCosts(Building())
@@ -656,7 +668,7 @@ if __name__ == "__main__":
     cooling_array = get_cooling_array()
     cooling_array = cooling_array * BUILDING_AREA
     outdoor_temperature = get_outdoor_temperature()
-    if st.button('Start beregning'):
+    if st.button('Start beregning', use_container_width=True):
         
         with st.expander('Energibehov'):
             building_instance = Building()
@@ -785,9 +797,9 @@ if __name__ == "__main__":
                 'Verdi grunnvarme' : int(value_array_geoenergy.sum()),
                 'Vannbåren varme' : int(WATERBORNE_HEATING_COST)
             }
-            st.write(result_map)
+            #st.write(result_map)
             df_final, air_water_stotte = economic_calculation(result_map=result_map, DISKONTERINGSRENTE=DISKONTERINGSRENTE, YEARS=YEARS, PERCENTAGE_INCREASE=PERCENTAGE_INCREASE, COVERED_BY_ENOVA = COVERED_BY_ENOVA)
-            st.write(df_final)
+            st.dataframe(df_final, use_container_width=200)
             economic_comparison(df_final)
             
             df_to_excel = pd.DataFrame({
@@ -812,7 +824,7 @@ if __name__ == "__main__":
                 
             })
             df_to_excel = df_to_excel.astype(int)
-            st.write(df_to_excel)
+            st.dataframe(df_to_excel, use_container_width=200)
 
 
     # 10000 for væske vann
