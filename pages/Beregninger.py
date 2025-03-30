@@ -113,13 +113,13 @@ def economic_calculation(result_map, PERCENTAGE_INCREASE=1.00, DISKONTERINGSRENT
             investment_air_air_list[i] = result_map[f'Investering luft-luft-VP']
 
         if i == 20 or i == 40 or i == 60:
-            #investment_geoenergy_list[i] = result_map['Investering bergvarme-VP'] * 0.6
+            investment_geoenergy_list[i] = result_map['Investering bergvarme-VP'] * 0.6
             investment_direct_list[i] = result_map['Investering direkte elektrisk'] 
             investment_air_air_list[i] = result_map[f'Investering luft-luft-VP'] *0.5
 
         # GARTNERVEIEN
-        if i == 6 or i == 26 or i == 46 or i == 66:
-            investment_geoenergy_list[i] = result_map['Investering bergvarme-VP'] * 0.6
+        #if i == 6 or i == 26 or i == 46 or i == 66:
+        #    investment_geoenergy_list[i] = result_map['Investering bergvarme-VP'] * 0.6
 
         # SKOGVEIEN
         #if i == 7 or i == 27 or i == 47 or i == 67:
