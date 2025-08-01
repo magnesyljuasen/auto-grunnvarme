@@ -568,16 +568,16 @@ class OperationCosts:
         self.NETTLEIE = 1
 
     def calculate_operation_costs(self, array):
-        st.markdown('---')
+        #with st.popover('Kostnadsdetaljer', use_container_width=True):
         spotcosts_array = self.spotprice_array * array # spotpris
-        st.write(f'Spotkostnader: {int(np.sum(spotcosts_array))} kr | {round(np.sum(spotcosts_array)/np.sum(array),2)} kr/kWh')
+        #st.write(f'Spotkostnader: {int(np.sum(spotcosts_array))} kr | {round(np.sum(spotcosts_array)/np.sum(array),2)} kr/kWh')
         network_energycosts_array = self.network_energy_array * array # energiledd
-        st.write(f'Energiledd: {int(np.sum(network_energycosts_array))} kr | {round(np.sum(network_energycosts_array)/np.sum(array),2)} kr/kWh')
+        #st.write(f'Energiledd: {int(np.sum(network_energycosts_array))} kr | {round(np.sum(network_energycosts_array)/np.sum(array),2)} kr/kWh')
         network_capacitycosts_array = self._network_capacity_component(array) # kapasitetsledd
-        st.write(f'Kapasitetsledd: {int(np.sum(network_capacitycosts_array))} kr | {round((np.sum(network_capacitycosts_array)/np.sum(array)),2)} kr/kWh')
-        st.write(f'Strømkostnader {int(np.sum(spotcosts_array + network_energycosts_array + network_capacitycosts_array))} kr')
-        st.write(f'Strøm: {int(np.sum(array))} kWh')
-        st.write(f'**Gjennomsnittlig strømpris: {round(int(np.sum(spotcosts_array + network_energycosts_array + network_capacitycosts_array))/int(np.sum(array)),2)} kr/kWh**')
+        #st.write(f'Kapasitetsledd: {int(np.sum(network_capacitycosts_array))} kr | {round((np.sum(network_capacitycosts_array)/np.sum(array)),2)} kr/kWh')
+        #st.write(f'Strømkostnader {int(np.sum(spotcosts_array + network_energycosts_array + network_capacitycosts_array))} kr')
+        #st.write(f'Strøm: {int(np.sum(array))} kWh')
+        #st.write(f'**Gjennomsnittlig strømpris: {round(int(np.sum(spotcosts_array + network_energycosts_array + network_capacitycosts_array))/int(np.sum(array)),2)} kr/kWh**')
         return spotcosts_array + network_energycosts_array + network_capacitycosts_array
     
     def calculate_operation_costs_fast_nettleie(self, array):
