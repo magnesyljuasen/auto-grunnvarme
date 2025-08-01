@@ -1,0 +1,387 @@
+﻿Eiendom,Spotprisår,Kostnad for vannbåren varme (kr),Kilde vannbåren varme,Kilde andre kostnader,Beregningstid (år),Diskonteringsrente (%),Nåverdi bergvarme (kr),Nåverdi luft-luft-varmepumpe (kr),Differanse (kr),Forklaring
+Markalleen 26B,2023,76500,Sweco,Sweco,30,4,257176,222134,35042,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Sweco,40,4,342198,262039,80159,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Sweco,50,4,387961,297025,90936,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Sweco,60,4,426764,323763,103001,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Sweco,30,5,201464,182964,18500,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Sweco,40,5,262791,211204,51587,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Sweco,50,5,292479,234346,58133,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Sweco,60,5,315592,250272,65320,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Sweco,30,6,154497,150141,4356,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Sweco,40,6,198903,170191,28712,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Sweco,50,6,218250,185573,32677,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Sweco,60,6,232096,195114,36982,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Sweco,30,4,117969,128909,-10940,Luft-vann-varmepumpe er lønnsom
+Markalleen 26B,2024,76500,Sweco,Sweco,40,4,180866,154008,26858,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Sweco,50,4,211682,178992,32690,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Sweco,60,4,240387,198972,41415,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Sweco,30,5,77882,100196,-22314,Luft-vann-varmepumpe er lønnsom
+Markalleen 26B,2024,76500,Sweco,Sweco,40,5,123250,117756,5494,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Sweco,50,5,143140,134342,8798,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Sweco,60,5,160239,146243,13996,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Sweco,30,6,44054,76167,-32113,Luft-vann-varmepumpe er lønnsom
+Markalleen 26B,2024,76500,Sweco,Sweco,40,6,76905,88484,-11579,Luft-vann-varmepumpe er lønnsom
+Markalleen 26B,2024,76500,Sweco,Sweco,50,6,89799,99548,-9749,Luft-vann-varmepumpe er lønnsom
+Markalleen 26B,2024,76500,Sweco,Sweco,60,6,100042,106678,-6636,Luft-vann-varmepumpe er lønnsom
+Markalleen 26B,2023,76500,Sweco,Asplan Viak,30,4,179025,42011,137014,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Asplan Viak,40,4,264047,56922,207125,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Asplan Viak,50,4,298871,78030,220841,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Asplan Viak,60,4,337674,104767,232907,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Asplan Viak,30,5,127488,8860,118628,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Asplan Viak,40,5,188815,18343,170472,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Asplan Viak,50,5,211042,32462,178580,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Asplan Viak,60,5,234156,48389,185767,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Asplan Viak,30,6,83939,-18794,102733,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Asplan Viak,40,6,128345,-12858,141203,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Asplan Viak,50,6,142586,-3366,145952,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Asplan Viak,60,6,156432,6174,150258,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Asplan Viak,30,4,39818,-51213,91031,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Asplan Viak,40,4,102715,-51108,153823,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Asplan Viak,50,4,122592,-40003,162595,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Asplan Viak,60,4,151297,-20023,171320,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Asplan Viak,30,5,3905,-73907,77812,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Asplan Viak,40,5,49274,-75104,124378,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Asplan Viak,50,5,61704,-67541,129245,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Asplan Viak,60,5,78803,-55639,134442,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Asplan Viak,30,6,-26503,-92768,66265,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Asplan Viak,40,6,6347,-94565,100912,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Asplan Viak,50,6,14135,-89391,103526,Bergvarme er lønnsom
+Markalleen 26B,2024,76500,Sweco,Asplan Viak,60,6,24378,-82261,106639,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Sweco,30,4,57136,22094,35042,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Sweco,40,4,142158,61999,80159,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Sweco,50,4,187921,96985,90936,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Sweco,60,4,226724,123723,103001,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Sweco,30,5,1424,-17075,18499,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Sweco,40,5,62751,11164,51587,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Sweco,50,5,92439,34306,58133,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Sweco,60,5,115552,50232,65320,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Sweco,30,6,-45542,-49898,4356,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Sweco,40,6,-1136,-29848,28712,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Sweco,50,6,18210,-14466,32676,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Sweco,60,6,32056,-4925,36981,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Sweco,30,4,-82070,-71130,-10940,Luft-vann-varmepumpe er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Sweco,40,4,-19173,-46031,26858,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Sweco,50,4,11642,-21047,32689,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Sweco,60,4,40347,-1067,41414,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Sweco,30,5,-122157,-99843,-22314,Luft-vann-varmepumpe er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Sweco,40,5,-76789,-82283,5494,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Sweco,50,5,-56899,-65697,8798,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Sweco,60,5,-39800,-53796,13996,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Sweco,30,6,-155985,-123872,-32113,Luft-vann-varmepumpe er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Sweco,40,6,-123134,-111555,-11579,Luft-vann-varmepumpe er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Sweco,50,6,-110240,-100491,-9749,Luft-vann-varmepumpe er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Sweco,60,6,-99997,-93361,-6636,Luft-vann-varmepumpe er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Asplan Viak,30,4,-21014,-158028,137014,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Asplan Viak,40,4,64007,-143117,207124,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Asplan Viak,50,4,98831,-122009,220840,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Asplan Viak,60,4,137634,-95272,232906,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Asplan Viak,30,5,-72551,-191179,118628,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Asplan Viak,40,5,-11224,-181696,170472,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Asplan Viak,50,5,11002,-167577,178579,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Asplan Viak,60,5,34116,-151650,185766,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Asplan Viak,30,6,-116100,-218834,102734,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Asplan Viak,40,6,-71694,-212898,141204,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Asplan Viak,50,6,-57453,-203406,145953,Bergvarme er lønnsom
+Markalleen 26B,2023,276540,Asplan Viak,Asplan Viak,60,6,-43607,-193865,150258,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Asplan Viak,30,4,-160221,-251253,91032,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Asplan Viak,40,4,-97324,-251148,153824,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Asplan Viak,50,4,-77447,-240043,162596,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Asplan Viak,60,4,-48742,-220063,171321,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Asplan Viak,30,5,-196134,-273947,77813,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Asplan Viak,40,5,-150765,-275144,124379,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Asplan Viak,50,5,-138335,-267581,129246,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Asplan Viak,60,5,-121236,-255679,134443,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Asplan Viak,30,6,-226543,-292808,66265,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Asplan Viak,40,6,-193692,-294605,100913,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Asplan Viak,50,6,-185904,-289431,103527,Bergvarme er lønnsom
+Markalleen 26B,2024,276540,Asplan Viak,Asplan Viak,60,6,-175661,-282301,106640,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Sweco,30,4,259984,240428,19556,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Sweco,40,4,351651,284932,66719,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Sweco,50,4,402371,323493,78878,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Sweco,60,4,444207,352329,91878,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Sweco,30,5,199390,197825,1565,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Sweco,40,5,265511,229382,36129,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Sweco,50,5,298460,254880,43580,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Sweco,60,5,323381,272056,51325,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Sweco,30,6,148322,162119,-13797,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Sweco,40,6,196198,184570,11628,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Sweco,50,6,217701,201512,16189,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Sweco,60,6,232630,211802,20828,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Sweco,30,4,109503,139656,-30153,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Sweco,40,4,177253,168154,9099,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Sweco,50,4,211816,195903,15913,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Sweco,60,4,242736,217434,25302,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Sweco,30,5,65800,108357,-42557,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Sweco,40,5,114669,128369,-13700,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Sweco,50,5,137028,146779,-9751,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Sweco,60,5,155446,159604,-4158,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Sweco,30,6,28935,82156,-53221,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Sweco,40,6,64320,96248,-31928,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Sweco,50,6,78848,108522,-29674,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Sweco,60,6,89881,116205,-26324,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Asplan Viak,30,4,205232,54986,150246,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Asplan Viak,40,4,296899,73757,223142,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Asplan Viak,50,4,336680,98030,238650,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Asplan Viak,60,4,378516,126866,251650,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Asplan Viak,30,5,148813,18579,130234,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Asplan Viak,40,5,214933,30826,184107,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Asplan Viak,50,5,240423,47034,193389,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Asplan Viak,60,5,265343,64211,201132,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Asplan Viak,30,6,101162,-11805,112967,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Asplan Viak,40,6,149039,-3885,152924,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Asplan Viak,50,6,165436,6993,158443,Bergvarme er lønnsom
+Kleivveien 44A,2023,91125,Sweco,Asplan Viak,60,6,180364,17282,163082,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Asplan Viak,30,4,54751,-45786,100537,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Asplan Viak,40,4,122501,-43019,165520,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Asplan Viak,50,4,146125,-29559,175684,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Asplan Viak,60,4,177045,-8028,185073,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Asplan Viak,30,5,15222,-70888,86110,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Asplan Viak,40,5,64091,-70187,134278,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Asplan Viak,50,5,78990,-61066,140056,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Asplan Viak,60,5,97409,-48240,145649,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Asplan Viak,30,6,-18223,-91768,73545,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Asplan Viak,40,6,17161,-92207,109368,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Asplan Viak,50,6,26583,-85996,112579,Bergvarme er lønnsom
+Kleivveien 44A,2024,91125,Sweco,Asplan Viak,60,6,37616,-78313,115929,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Sweco,30,4,44750,25194,19556,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Sweco,40,4,136417,69698,66719,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Sweco,50,4,187137,108259,78878,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Sweco,60,4,228973,137095,91878,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Sweco,30,5,-15843,-17408,1565,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Sweco,40,5,50277,14148,36129,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Sweco,50,5,83226,39646,43580,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Sweco,60,5,108147,56822,51325,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Sweco,30,6,-66911,-53114,-13797,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Sweco,40,6,-19035,-30663,11628,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Sweco,50,6,2467,-13721,16188,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Sweco,60,6,17396,-3431,20827,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Sweco,30,4,-105730,-75577,-30153,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Sweco,40,4,-37980,-47079,9099,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Sweco,50,4,-3417,-19330,15913,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Sweco,60,4,27502,2200,25302,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Sweco,30,5,-149433,-106876,-42557,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Sweco,40,5,-100564,-86864,-13700,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Sweco,50,5,-78205,-68454,-9751,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Sweco,60,5,-59787,-55629,-4158,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Sweco,30,6,-186298,-133077,-53221,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Sweco,40,6,-150913,-118985,-31928,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Sweco,50,6,-136385,-106711,-29674,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Sweco,60,6,-125352,-99028,-26324,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Asplan Viak,30,4,-10001,-160247,150246,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Asplan Viak,40,4,81665,-141476,223141,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Asplan Viak,50,4,121446,-117203,238649,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Asplan Viak,60,4,163282,-88367,251649,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Asplan Viak,30,5,-66420,-196654,130234,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Asplan Viak,40,5,-300,-184407,184107,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Asplan Viak,50,5,25189,-168199,193388,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Asplan Viak,60,5,50109,-151022,201131,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Asplan Viak,30,6,-114071,-227039,112968,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Asplan Viak,40,6,-66194,-219119,152925,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Asplan Viak,50,6,-49797,-208240,158443,Bergvarme er lønnsom
+Kleivveien 44A,2023,306359,Asplan Viak,Asplan Viak,60,6,-34869,-197951,163082,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Asplan Viak,30,4,-160482,-261020,100538,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Asplan Viak,40,4,-92732,-258253,165521,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Asplan Viak,50,4,-69108,-244793,175685,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Asplan Viak,60,4,-38188,-223262,185074,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Asplan Viak,30,5,-200011,-286122,86111,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Asplan Viak,40,5,-151142,-285421,134279,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Asplan Viak,50,5,-136243,-276300,140057,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Asplan Viak,60,5,-117824,-263474,145650,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Asplan Viak,30,6,-233457,-307002,73545,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Asplan Viak,40,6,-198072,-307441,109369,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Asplan Viak,50,6,-188650,-301230,112580,Bergvarme er lønnsom
+Kleivveien 44A,2024,306359,Asplan Viak,Asplan Viak,60,6,-177617,-293547,115930,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Sweco,30,4,273276,257288,15988,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Sweco,40,4,362727,300258,62469,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Sweco,50,4,411794,337626,74168,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Sweco,60,4,452618,365761,86857,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Sweco,30,5,214310,215831,-1521,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Sweco,40,5,278832,246281,32551,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Sweco,50,5,310694,270992,39702,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Sweco,60,5,335011,287752,47259,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Sweco,30,6,164609,181087,-16478,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Sweco,40,6,211328,202737,8591,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Sweco,50,6,232112,219158,12954,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Sweco,60,6,246679,229198,17481,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Sweco,30,4,126542,159037,-32495,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Sweco,40,4,192671,186402,6269,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Sweco,50,4,225984,213228,12756,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Sweco,60,4,256164,234242,21922,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Sweco,30,5,84046,128601,-44555,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Sweco,40,5,131746,147795,-16049,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Sweco,50,5,153281,165596,-12315,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Sweco,60,5,171258,178114,-6856,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Sweco,30,6,48195,103124,-54929,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Sweco,40,6,82734,116624,-33890,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Sweco,50,6,96716,128495,-31779,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Sweco,60,6,107486,135993,-28507,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Asplan Viak,30,4,219460,73619,145841,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Asplan Viak,40,4,308911,91102,217809,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Asplan Viak,50,4,347039,114319,232720,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Asplan Viak,60,4,387863,142454,245409,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Asplan Viak,30,5,164669,38299,126370,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Asplan Viak,40,5,229191,49623,179568,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Asplan Viak,50,5,253593,65134,188459,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Asplan Viak,60,5,277910,81894,196016,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Asplan Viak,30,6,118386,8825,109561,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Asplan Viak,40,6,165105,16082,149023,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Asplan Viak,50,6,180783,26499,154284,Bergvarme er lønnsom
+Kleivveien 44B,2023,63281,Sweco,Asplan Viak,60,6,195350,36538,158812,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Asplan Viak,30,4,72725,-24631,97356,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Asplan Viak,40,4,138855,-22753,161608,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Asplan Viak,50,4,161229,-10078,171307,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Asplan Viak,60,4,191409,10935,180474,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Asplan Viak,30,5,34404,-48930,83334,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Asplan Viak,40,5,82104,-48862,130966,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Asplan Viak,50,5,96179,-40261,136440,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Asplan Viak,60,5,114157,-27743,141900,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Asplan Viak,30,6,1972,-69137,71109,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Asplan Viak,40,6,36510,-70029,106539,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Asplan Viak,50,6,45387,-64164,109551,Bergvarme er lønnsom
+Kleivveien 44B,2024,63281,Sweco,Asplan Viak,60,6,56157,-56665,112822,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Sweco,30,4,57444,41456,15988,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Sweco,40,4,146895,84426,62469,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Sweco,50,4,195962,121794,74168,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Sweco,60,4,236786,149929,86857,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Sweco,30,5,-1521,0,-1521,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Sweco,40,5,63000,30449,32551,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Sweco,50,5,94862,55160,39702,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Sweco,60,5,119179,71920,47259,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Sweco,30,6,-51222,-34744,-16478,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Sweco,40,6,-4503,-13094,8591,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Sweco,50,6,16280,3326,12954,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Sweco,60,6,30847,13366,17481,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Sweco,30,4,-89289,-56794,-32495,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Sweco,40,4,-23160,-29429,6269,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Sweco,50,4,10152,-2603,12755,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Sweco,60,4,40332,18410,21922,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Sweco,30,5,-131785,-87230,-44555,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Sweco,40,5,-84085,-68036,-16049,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Sweco,50,5,-62550,-50235,-12315,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Sweco,60,5,-44573,-37717,-6856,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Sweco,30,6,-167636,-112707,-54929,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Sweco,40,6,-133097,-99207,-33890,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Sweco,50,6,-119115,-87336,-31779,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Sweco,60,6,-108345,-79838,-28507,Luft-vann-varmepumpe er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Asplan Viak,30,4,3628,-142212,145840,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Asplan Viak,40,4,93079,-124729,217808,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Asplan Viak,50,4,131207,-101512,232719,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Asplan Viak,60,4,172031,-73377,245408,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Asplan Viak,30,5,-51162,-177532,126370,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Asplan Viak,40,5,13359,-166208,179567,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Asplan Viak,50,5,37761,-150697,188458,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Asplan Viak,60,5,62078,-133937,196015,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Asplan Viak,30,6,-97445,-207006,109561,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Asplan Viak,40,6,-50726,-199749,149023,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Asplan Viak,50,6,-35048,-189332,154284,Bergvarme er lønnsom
+Kleivveien 44B,2023,279113,Asplan Viak,Asplan Viak,60,6,-20481,-179293,158812,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Asplan Viak,30,4,-143106,-240463,97357,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Asplan Viak,40,4,-76976,-238585,161609,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Asplan Viak,50,4,-54602,-225910,171308,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Asplan Viak,60,4,-24422,-204896,180474,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Asplan Viak,30,5,-181427,-264762,83335,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Asplan Viak,40,5,-133727,-264694,130967,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Asplan Viak,50,5,-119652,-256093,136441,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Asplan Viak,60,5,-101674,-243575,141901,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Asplan Viak,30,6,-213859,-284969,71110,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Asplan Viak,40,6,-179321,-285861,106540,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Asplan Viak,50,6,-170444,-279996,109552,Bergvarme er lønnsom
+Kleivveien 44B,2024,279113,Asplan Viak,Asplan Viak,60,6,-159674,-272497,112823,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Sweco,30,4,432967,360082,72885,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Sweco,40,4,557058,424491,132567,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Sweco,50,4,631932,479054,152878,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Sweco,60,4,688565,518134,170431,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Sweco,30,5,348569,301348,47221,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Sweco,40,5,438077,347188,90889,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Sweco,50,5,486919,383242,103677,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Sweco,60,5,520654,406521,114133,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Sweco,30,6,277496,252101,25395,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Sweco,40,6,342307,284841,57466,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Sweco,50,6,374316,308781,65535,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Sweco,60,6,394525,322725,71800,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Sweco,30,4,228288,223021,5267,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Sweco,40,4,319848,265661,54187,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Sweco,50,4,372746,305519,67227,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Sweco,60,4,414532,334663,79869,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Sweco,30,5,166864,179661,-12797,Luft-vann-varmepumpe er lønnsom
+Søråsen 6B,2024,113625,Sweco,Sweco,40,5,232907,209800,23107,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Sweco,50,5,267344,236214,31130,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Sweco,60,5,292235,253574,38661,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Sweco,30,6,115110,143343,-28233,Luft-vann-varmepumpe er lønnsom
+Søråsen 6B,2024,113625,Sweco,Sweco,40,6,162930,164713,-1783,Luft-vann-varmepumpe er lønnsom
+Søråsen 6B,2024,113625,Sweco,Sweco,50,6,185453,182304,3149,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Sweco,60,6,200363,192704,7659,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Asplan Viak,30,4,373594,160543,213051,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Asplan Viak,40,4,497684,197264,300420,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Asplan Viak,50,4,560795,236452,324343,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Asplan Viak,60,4,617428,275532,341896,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Asplan Viak,30,5,293686,108476,185210,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Asplan Viak,40,5,383194,133538,249656,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Asplan Viak,50,5,424013,159597,264416,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Asplan Viak,60,5,457748,182876,274872,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Asplan Viak,30,6,226288,64955,161333,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Asplan Viak,40,6,291099,82059,209040,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Asplan Viak,50,6,317618,99474,218144,Bergvarme er lønnsom
+Søråsen 6B,2023,113625,Sweco,Asplan Viak,60,6,337826,113419,224407,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Asplan Viak,30,4,168914,23482,145432,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Asplan Viak,40,4,260474,38434,222040,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Asplan Viak,50,4,301608,62917,238691,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Asplan Viak,60,4,343395,92061,251334,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Asplan Viak,30,5,111980,-13210,125190,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Asplan Viak,40,5,178023,-3850,181873,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Asplan Viak,50,5,204438,12569,191869,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Asplan Viak,60,5,229329,29929,199400,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Asplan Viak,30,6,63902,-43802,107704,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Asplan Viak,40,6,111723,-38068,149791,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Asplan Viak,50,6,128754,-27001,155755,Bergvarme er lønnsom
+Søråsen 6B,2024,113625,Sweco,Asplan Viak,60,6,143665,-16601,160266,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Sweco,30,4,191397,118512,72885,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Sweco,40,4,315488,182921,132567,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Sweco,50,4,390362,237484,152878,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Sweco,60,4,446995,276564,170431,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Sweco,30,5,106999,59778,47221,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Sweco,40,5,196507,105618,90889,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Sweco,50,5,245349,141672,103677,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Sweco,60,5,279084,164951,114133,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Sweco,30,6,35926,10531,25395,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Sweco,40,6,100737,43271,57466,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Sweco,50,6,132746,67211,65535,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Sweco,60,6,152955,81155,71800,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Sweco,30,4,-13281,-18548,5267,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Sweco,40,4,78278,24091,54187,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Sweco,50,4,131176,63949,67227,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Sweco,60,4,172962,93093,79869,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Sweco,30,5,-74705,-61908,-12797,Luft-vann-varmepumpe er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Sweco,40,5,-8662,-31769,23107,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Sweco,50,5,25774,-5355,31129,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Sweco,60,5,50665,12004,38661,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Sweco,30,6,-126459,-98226,-28233,Luft-vann-varmepumpe er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Sweco,40,6,-78639,-76856,-1783,Luft-vann-varmepumpe er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Sweco,50,6,-56116,-59265,3149,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Sweco,60,6,-41206,-48865,7659,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Asplan Viak,30,4,132024,-81026,213050,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Asplan Viak,40,4,256114,-44305,300419,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Asplan Viak,50,4,319225,-5117,324342,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Asplan Viak,60,4,375858,33962,341896,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Asplan Viak,30,5,52116,-133093,185209,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Asplan Viak,40,5,141624,-108031,249655,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Asplan Viak,50,5,182443,-81972,264415,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Asplan Viak,60,5,216178,-58693,274871,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Asplan Viak,30,6,-15281,-176614,161333,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Asplan Viak,40,6,49529,-159510,209039,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Asplan Viak,50,6,76048,-142095,218143,Bergvarme er lønnsom
+Søråsen 6B,2023,355195,Asplan Viak,Asplan Viak,60,6,96256,-128150,224406,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Asplan Viak,30,4,-72655,-218087,145432,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Asplan Viak,40,4,18904,-203135,222039,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Asplan Viak,50,4,60038,-178652,238690,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Asplan Viak,60,4,101825,-149508,251333,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Asplan Viak,30,5,-129589,-254780,125191,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Asplan Viak,40,5,-63546,-245420,181874,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Asplan Viak,50,5,-37131,-229000,191869,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Asplan Viak,60,5,-12240,-211640,199400,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Asplan Viak,30,6,-177667,-285372,107705,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Asplan Viak,40,6,-129846,-279638,149792,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Asplan Viak,50,6,-112815,-268571,155756,Bergvarme er lønnsom
+Søråsen 6B,2024,355195,Asplan Viak,Asplan Viak,60,6,-97904,-258171,160267,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Sweco,30,4,257176,222134,35042,Bergvarme er lønnsom
+Markalleen 26B,2023,76500,Sweco,Sweco,40,4,342198,262039,80159,Bergvarme er lønnsom

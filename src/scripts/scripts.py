@@ -792,6 +792,6 @@ class Visualization:
             #linecolor="black",
             #gridcolor="lightgrey",
         )
-        if export_name != None:
-            fig.write_image(f"src/plots/{export_name}.svg")
+        # if export_name != None:
+        #     fig.write_image(f"src/plots/{export_name}.svg")
         return fig
